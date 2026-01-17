@@ -301,7 +301,7 @@ function MarketCard({ market }: { market: (typeof allMarkets)[0] }) {
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <Link
-                href={`/markets/category/${market.category.toLowerCase().replace(/ & /g, "-").replace(/ /g, "-")}`}
+                href={`/markets/${market.category.toLowerCase().replace(/ & /g, "-").replace(/ /g, "-")}`}
                 onClick={(e) => e.stopPropagation()}
                 className="hover:opacity-80 transition-opacity"
               >
@@ -387,7 +387,7 @@ function MarketListItem({ market }: { market: (typeof allMarkets)[0] }) {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <Link
-                href={`/markets/category/${market.category.toLowerCase().replace(/ & /g, "-").replace(/ /g, "-")}`}
+                href={`/markets/${market.category.toLowerCase().replace(/ & /g, "-").replace(/ /g, "-")}`}
                 onClick={(e) => e.stopPropagation()}
                 className="hover:opacity-80 transition-opacity"
               >
