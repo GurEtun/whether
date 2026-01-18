@@ -7,14 +7,8 @@ export function Footer() {
         <div className="grid gap-8 md:grid-cols-4">
           {/* Brand */}
           <div className="md:col-span-1">
-            <Link href="/" className="group relative inline-flex items-center">
-              <span className="relative text-xl font-black tracking-tight text-white transition-all duration-300">
-                Whether
-                <span className="absolute inset-0 bg-gradient-to-b from-white/80 via-white/40 to-transparent bg-clip-text text-transparent" />
-                <span className="absolute -inset-1 opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100">
-                  <span className="absolute inset-0 bg-gradient-to-r from-white/60 via-blue-200/60 to-white/60" />
-                </span>
-              </span>
+            <Link href="/" className="inline-flex items-center">
+              <span className="text-xl font-black tracking-tight text-white">whether</span>
             </Link>
             <p className="mt-4 text-sm text-muted-foreground">
               Trade on real-world events with the best execution on Solana. Powered by DFlow infrastructure.
@@ -26,27 +20,27 @@ export function Footer() {
             <h4 className="mb-4 font-semibold text-foreground">Markets</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <Link href="#" className="hover:text-foreground">
+                <Link href="/markets" className="hover:text-foreground">
                   All Markets
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-foreground">
+                <Link href="/markets/category/politics" className="hover:text-foreground">
                   Politics
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-foreground">
+                <Link href="/markets/category/sports" className="hover:text-foreground">
                   Sports
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-foreground">
+                <Link href="/markets/category/crypto" className="hover:text-foreground">
                   Crypto
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-foreground">
+                <Link href="/markets/category/economics" className="hover:text-foreground">
                   Economics
                 </Link>
               </li>
@@ -58,23 +52,23 @@ export function Footer() {
             <h4 className="mb-4 font-semibold text-foreground">Resources</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <Link href="#" className="hover:text-foreground">
+                <Link href="https://pond.dflow.net/introduction" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">
                   API Documentation
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-foreground">
+                <Link href="/#how-it-works" className="hover:text-foreground">
                   How It Works
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-foreground">
+                <Link href="/faq" className="hover:text-foreground">
                   FAQ
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-foreground">
-                  Blog
+                <Link href="/leaderboard" className="hover:text-foreground">
+                  Leaderboard
                 </Link>
               </li>
             </ul>
@@ -85,22 +79,22 @@ export function Footer() {
             <h4 className="mb-4 font-semibold text-foreground">Company</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <Link href="#" className="hover:text-foreground">
-                  About
+                <Link href="/portfolio" className="hover:text-foreground">
+                  Portfolio
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-foreground">
-                  Careers
+                <Link href="/leaderboard" className="hover:text-foreground">
+                  Leaderboard
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-foreground">
+                <Link href="/faq" className="hover:text-foreground">
                   Terms of Service
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-foreground">
+                <Link href="/faq" className="hover:text-foreground">
                   Privacy Policy
                 </Link>
               </li>

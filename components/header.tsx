@@ -16,14 +16,8 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
-          <Link href="/" className="group relative flex items-center">
-            <span className="relative text-2xl font-black tracking-tight text-white transition-all duration-300">
-              Whether
-              <span className="absolute inset-0 bg-gradient-to-b from-white/80 via-white/40 to-transparent bg-clip-text text-transparent" />
-              <span className="absolute -inset-1 opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100">
-                <span className="absolute inset-0 bg-gradient-to-r from-white/60 via-blue-200/60 to-white/60" />
-              </span>
-            </span>
+          <Link href="/" className="flex items-center">
+            <span className="text-2xl font-black tracking-tight text-white">whether</span>
           </Link>
 
           {/* Desktop Navigation */}

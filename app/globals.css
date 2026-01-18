@@ -137,3 +137,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Green light sweep animation for logo */
+@keyframes sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}

@@ -5,12 +5,14 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { TrendingUp, TrendingDown, Clock, Users, ArrowRight, Flame } from "lucide-react"
+import { TrendingUp, TrendingDown, Clock, Users, ArrowRight, Flame, Loader2 } from "lucide-react"
 import Link from "next/link"
+import { useDFlowMarkets } from "@/hooks/use-dflow-markets"
 
-const featuredMarkets = [
+// Fallback markets for when API is unavailable
+const fallbackMarkets = [
   {
-    id: 1,
+    id: "market-1",
     title: "Will the Fed cut rates by June 2026?",
     category: "Economics",
     yesPrice: 72,
@@ -21,7 +23,7 @@ const featuredMarkets = [
     trending: true,
   },
   {
-    id: 2,
+    id: "market-2",
     title: "Will ETH flip BTC market cap in 2026?",
     category: "Crypto",
     yesPrice: 23,
@@ -32,7 +34,7 @@ const featuredMarkets = [
     trending: true,
   },
   {
-    id: 3,
+    id: "market-3",
     title: "Will there be a major AI regulation bill passed in 2026?",
     category: "Politics",
     yesPrice: 58,
@@ -43,7 +45,7 @@ const featuredMarkets = [
     trending: false,
   },
   {
-    id: 4,
+    id: "market-4",
     title: "Will Taylor Swift announce a new album by Q2 2026?",
     category: "Entertainment",
     yesPrice: 81,
@@ -54,7 +56,7 @@ const featuredMarkets = [
     trending: false,
   },
   {
-    id: 5,
+    id: "market-5",
     title: "Will SpaceX Starship complete orbital refueling by 2026?",
     category: "Science & Tech",
     yesPrice: 45,
@@ -65,7 +67,7 @@ const featuredMarkets = [
     trending: true,
   },
   {
-    id: 6,
+    id: "market-6",
     title: "Will Manchester City win the Premier League 25/26?",
     category: "Sports",
     yesPrice: 34,
@@ -77,8 +79,26 @@ const featuredMarkets = [
   },
 ]
 
+interface Market {
+  id: string
+  title: string
+  category: string
+  yesPrice: number
+  change: number
+  volume: string
+  traders: number
+  endDate: string
+  trending?: boolean
+}
+
 export function FeaturedMarkets() {
   const [sortBy, setSortBy] = useState("trending")
+  const { markets: dflowMarkets, isLoading } = useDFlowMarkets("active")
+  
+  // Use DFlow markets if available, otherwise fallback
+  const featuredMarkets: Market[] = dflowMarkets.length > 0 
+    ? dflowMarkets.slice(0, 6) 
+    : fallbackMarkets
 
   return (
     <section className="py-12">
@@ -118,11 +138,11 @@ export function FeaturedMarkets() {
   )
 }
 
-function MarketCard({ market }: { market: (typeof featuredMarkets)[0] }) {
+function MarketCard({ market }: { market: Market }) {
   const isPositive = market.change >= 0
 
   return (
-    <Link href={`/markets/market-${market.id}`}>
+    <Link href={`/markets/${market.id}`}>
       <Card className="group cursor-pointer border-border bg-card transition-all hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 h-full">
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between gap-2">

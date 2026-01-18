@@ -7,10 +7,12 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, TrendingUp, TrendingDown, Clock, Users, Flame, Grid3X3, List, Layers } from "lucide-react"
+import { Search, TrendingUp, TrendingDown, Clock, Users, Flame, Grid3X3, List, Layers, Loader2 } from "lucide-react"
 import Link from "next/link"
+import { useDFlowMarkets } from "@/hooks/use-dflow-markets"
 
-const allMarkets = [
+// Fallback markets for when API is unavailable
+const fallbackMarkets = [
   {
     id: "btc-150k",
     title: "Will BTC reach $150K by March 2026?",
@@ -155,6 +157,10 @@ export function MarketsExplorer({ initialCategory }: { initialCategory?: string 
   const [selectedStatus, setSelectedStatus] = useState("All")
   const [sortBy, setSortBy] = useState("trending")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
+  const { markets: dflowMarkets, isLoading } = useDFlowMarkets("active")
+  
+  // Use DFlow markets if available, otherwise fallback
+  const allMarkets = dflowMarkets.length > 0 ? dflowMarkets : fallbackMarkets
 
   const filteredMarkets = allMarkets.filter((market) => {
     const matchesSearch = market.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -288,7 +294,7 @@ export function MarketsExplorer({ initialCategory }: { initialCategory?: string 
   )
 }
 
-function MarketCard({ market }: { market: (typeof allMarkets)[0] }) {
+function MarketCard({ market }: { market: (typeof fallbackMarkets)[0] }) {
   const isPositive = market.change >= 0
 
   return (
@@ -370,7 +376,7 @@ function MarketCard({ market }: { market: (typeof allMarkets)[0] }) {
   )
 }
 
-function MarketListItem({ market }: { market: (typeof allMarkets)[0] }) {
+function MarketListItem({ market }: { market: (typeof fallbackMarkets)[0] }) {
   const isPositive = market.change >= 0
 
   return (
