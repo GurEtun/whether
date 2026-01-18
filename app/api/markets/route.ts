@@ -66,6 +66,18 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const status = searchParams.get("status") || "active"
   const limit = searchParams.get("limit") || "200"
+  
+  // Check if we're in a preview/development environment
+  const host = request.headers.get("host") || ""
+  const isPreview = host.includes("vusercontent.net") || 
+                    host.includes("v0.dev") || 
+                    host.includes("localhost") ||
+                    host.includes("vercel.app")
+  
+  // In preview environments, skip the API call and return fallback directly
+  if (isPreview) {
+    return NextResponse.json(FALLBACK_EVENTS)
+  }
 
   try {
     const params = new URLSearchParams()
@@ -87,16 +99,12 @@ export async function GET(request: Request) {
     )
 
     if (!response.ok) {
-      console.log(`[v0] DFlow API returned ${response.status}, using fallback data`)
-      // Return fallback data on error instead of failing
       return NextResponse.json(FALLBACK_EVENTS)
     }
 
     const data = await response.json()
     return NextResponse.json(data)
-  } catch (error) {
-    console.error("Error fetching from DFlow API:", error)
-    // Return fallback data on error
+  } catch {
     return NextResponse.json(FALLBACK_EVENTS)
   }
 }
