@@ -52,11 +52,6 @@ export function Footer() {
             <h4 className="mb-4 font-semibold text-foreground">Resources</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <Link href="https://pond.dflow.net/introduction" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">
-                  API Documentation
-                </Link>
-              </li>
-              <li>
                 <Link href="/#how-it-works" className="hover:text-foreground">
                   How It Works
                 </Link>
@@ -69,6 +64,11 @@ export function Footer() {
               <li>
                 <Link href="/leaderboard" className="hover:text-foreground">
                   Leaderboard
+                </Link>
+              </li>
+              <li>
+                <Link href="https://pond.dflow.net" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">
+                  Developer Docs
                 </Link>
               </li>
             </ul>

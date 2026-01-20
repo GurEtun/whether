@@ -11,7 +11,7 @@ const features = [
     icon: Route,
     title: "Smart Order Routing",
     description: "DFlow automatically routes orders for best execution across liquidity sources.",
-    badge: "Trade API",
+    badge: "Trading",
   },
   {
     icon: ArrowLeftRight,

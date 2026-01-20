@@ -79,15 +79,6 @@ export function Header() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-48">
                 <DropdownMenuItem asChild>
-                  <Link
-                    href="https://pond.dflow.net"
-                    target="_blank"
-                    className="flex w-full cursor-pointer items-center"
-                  >
-                    <BarChart3 className="mr-2 h-4 w-4" /> API Docs
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
                   <Link href="/#how-it-works" className="flex w-full cursor-pointer">
                     How It Works
                   </Link>

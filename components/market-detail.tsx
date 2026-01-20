@@ -649,7 +649,7 @@ export function MarketDetail({ market }: { market: Market }) {
                 {/* Info */}
                 <div className="flex items-start gap-1.5 rounded-lg bg-secondary/30 p-2 sm:p-3 text-[8px] sm:text-xs text-muted-foreground leading-relaxed">
                   <Info className="mt-0.5 h-3 w-3 shrink-0" />
-                  <p>Orders route through DFlow&apos;s Trade API. Settlement on Solana.</p>
+                  <p>All trades execute on-chain with best execution. Settlement on Solana.</p>
                 </div>
               </CardContent>
             </Card>

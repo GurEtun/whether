@@ -41,9 +41,9 @@ export function HeroSection() {
                   Explore Markets <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
-              <Link href="/docs" className="w-full sm:w-auto">
+              <Link href="/#how-it-works" className="w-full sm:w-auto">
                 <Button size="lg" variant="outline" className="w-full gap-2 bg-transparent">
-                  <Layers className="h-4 w-4" /> View API Docs
+                  <Layers className="h-4 w-4" /> Learn How It Works
                 </Button>
               </Link>
             </div>

@@ -14,7 +14,7 @@ const steps = [
   {
     icon: Search,
     title: "Discover Markets",
-    description: "Browse series and events across politics, sports, crypto, and more via DFlow's Metadata API.",
+    description: "Browse series and events across politics, sports, crypto, and more.",
   },
   {
     icon: TrendingUp,
