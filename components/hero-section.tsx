@@ -28,12 +28,11 @@ export function HeroSection() {
             </div>
 
             <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl xl:text-6xl text-balance">
-              Trade Outcomes, <span className="text-primary">{"Understand why"}</span>
+              Trade Outcomes. <span className="text-primary">Understand Why.</span>
             </h1>
 
             <p className="max-w-lg text-base sm:text-lg text-muted-foreground text-pretty">
-              Access prediction markets with institutional-grade execution. DFlow handles the infrastructure - you focus
-              on making predictions that matter.
+              Whether is a social prediction trading app where people trade on real-world events, discuss their reasoning, and get AI-powered market analysis — powered by DFlow on Solana.
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">

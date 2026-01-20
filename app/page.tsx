@@ -2,6 +2,7 @@ import { Header } from "@/components/header"
 import { HeroSection } from "@/components/hero-section"
 import { MarketCategories } from "@/components/market-categories"
 import { FeaturedMarkets } from "@/components/featured-markets"
+import { SocialAIFeatures } from "@/components/social-ai-features"
 import { TrendingMarkets } from "@/components/trending-markets"
 import { MarketSeries } from "@/components/market-series"
 import { DFlowFeatures } from "@/components/dflow-features"
@@ -17,6 +18,7 @@ export default function Home() {
         <HeroSection />
         <MarketCategories />
         <FeaturedMarkets />
+        <SocialAIFeatures />
         <TrendingMarkets />
         <MarketSeries />
         <DFlowFeatures />

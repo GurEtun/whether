@@ -19,12 +19,12 @@ const steps = [
   {
     icon: TrendingUp,
     title: "Trade Outcomes",
-    description: "Buy Yes or No tokens using DFlow's Trade API. Prices reflect market probability.",
+    description: "Buy Yes or No outcome tokens. Prices reflect the market's implied probability.",
   },
   {
     icon: Banknote,
-    title: "Redeem Winnings",
-    description: "When markets resolve, redeem winning tokens for $1 each via on-chain settlement.",
+    title: "Redeem Resolved Outcomes",
+    description: "When markets resolve, redeem settled tokens via on-chain settlement.",
   },
 ]
 
@@ -35,7 +35,7 @@ export function HowItWorks() {
         <div className="mb-12 text-center">
           <h2 className="text-2xl font-bold text-foreground sm:text-3xl">How It Works</h2>
           <p className="mt-3 text-lg text-muted-foreground">
-            Start trading in minutes with DFlow&apos;s institutional-grade infrastructure
+            Start trading in minutes with non-custodial, on-chain execution
           </p>
         </div>
 

@@ -11,7 +11,7 @@ export function Footer() {
               <span className="text-xl font-black tracking-tight text-primary italic">whether</span>
             </Link>
             <p className="mt-4 text-sm text-muted-foreground">
-              Trade on real-world events with the best execution on Solana. Powered by DFlow infrastructure.
+              Trade real-world outcomes. Understand the market behind them.
             </p>
           </div>
 

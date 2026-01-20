@@ -40,7 +40,7 @@ const features = [
   {
     icon: CheckCircle2,
     title: "Automated Redemption",
-    description: "When markets resolve, winning tokens are automatically redeemable for stablecoins.",
+    description: "When markets resolve, settled tokens are redeemable via on-chain settlement.",
     badge: "Settlement",
   },
 ]
@@ -57,11 +57,10 @@ export function DFlowFeatures() {
             <span className="text-base sm:text-lg font-semibold text-primary">DFlow Infrastructure</span>
           </div>
           <h2 className="text-xl font-bold text-foreground sm:text-2xl lg:text-3xl mb-2 sm:mb-3">
-            Institutional-Grade Trading
+            Non-Custodial, On-Chain Execution
           </h2>
           <p className="max-w-2xl mx-auto text-sm sm:text-base text-muted-foreground px-4">
-            Built on DFlow&apos;s prediction market infrastructure - focusing on UX while the platform handles
-            discovery, execution, positions, and settlement.
+            Built on DFlow&apos;s prediction market infrastructure - transparent, secure, and fully on-chain with best execution on Solana.
           </p>
         </div>
 
@@ -119,8 +118,8 @@ export function DFlowFeatures() {
             <StepConnector />
             <LifecycleStep
               step={4}
-              title="Redeem Outcomes"
-              description="Claim winning tokens"
+              title="Redeem Resolved Outcomes"
+              description="Redeem settled tokens"
               icon={<CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5" />}
             />
           </div>
