@@ -684,152 +684,152 @@ export function MarketDetail({ market }: { market: Market }) {
         </div>
       </div>
 
-      {/* AI Panel - full screen on mobile */}
-      <div
-        className={`fixed inset-0 sm:inset-y-0 sm:right-0 sm:left-auto z-50 w-full sm:w-[360px] lg:w-[400px] bg-background border-l border-border shadow-2xl transform transition-transform duration-300 ease-in-out ${
-          showAIPanel ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
-        <div className="flex flex-col h-full">
-          {/* Panel Header */}
-          <div className="flex items-center justify-between p-3 sm:p-4 border-b border-border bg-card">
-            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-              <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                <Bot className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-              </div>
-              <div className="min-w-0">
-                <h3 className="font-semibold text-foreground text-sm sm:text-base">AI Assistant</h3>
-                <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{market.title.slice(0, 25)}...</p>
-              </div>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 sm:h-10 sm:w-10 shrink-0"
-              onClick={() => setShowAIPanel(false)}
-            >
-              <X className="h-4 w-4 sm:h-5 sm:w-5" />
-            </Button>
-          </div>
-
-          {/* Market Context Banner */}
-          <div className="px-3 py-2 sm:px-4 sm:py-3 bg-secondary/50 border-b border-border">
-            <div className="flex items-center justify-between text-[10px] sm:text-xs">
-              <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant="secondary" className="text-[9px] sm:text-[10px]">
-                  {market.category}
-                </Badge>
-                <span className="text-muted-foreground">Yes: {market.yesPrice}¢</span>
-                <span className={market.change >= 0 ? "text-success" : "text-danger"}>
-                  {market.change >= 0 ? "+" : ""}
-                  {market.change}%
-                </span>
-              </div>
-              <Button variant="ghost" size="sm" className="h-5 sm:h-6 px-1.5 sm:px-2 text-[9px] sm:text-xs gap-1">
-                <RefreshCw className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
-            {aiMessages.length === 0 ? (
-              <div className="text-center py-6 sm:py-8">
-                <Sparkles className="h-8 w-8 sm:h-12 sm:w-12 mx-auto text-primary/50 mb-3 sm:mb-4" />
-                <h4 className="font-medium text-foreground mb-2 text-sm sm:text-base">Ask me anything</h4>
-                <p className="text-[11px] sm:text-sm text-muted-foreground mb-4 sm:mb-6">
-                  Real-time context about prices, volume, and activity.
-                </p>
-                <div className="space-y-1.5 sm:space-y-2">
-                  {quickPrompts.map((prompt, i) => (
-                    <button
-                      key={i}
-                      onClick={() => {
-                        setAiInput(prompt)
-                        setTimeout(() => {
-                          const form = document.getElementById("ai-form") as HTMLFormElement
-                          form?.requestSubmit()
-                        }, 100)
-                      }}
-                      className="w-full text-left text-[11px] sm:text-sm p-2.5 sm:p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors text-muted-foreground hover:text-foreground"
-                    >
-                      {prompt}
-                    </button>
-                  ))}
+      {/* AI Panel - full screen on mobile - only render when shown or has been shown */}
+      {showAIPanel && (
+        <div
+          className="fixed inset-0 sm:inset-y-0 sm:right-0 sm:left-auto z-50 w-full sm:w-[360px] lg:w-[400px] bg-background border-l border-border shadow-2xl transform transition-transform duration-300 ease-in-out translate-x-0"
+        >
+          <div className="flex flex-col h-full">
+            {/* Panel Header */}
+            <div className="flex items-center justify-between p-3 sm:p-4 border-b border-border bg-card">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <Bot className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="font-semibold text-foreground text-sm sm:text-base">AI Assistant</h3>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{market.title.slice(0, 25)}...</p>
                 </div>
               </div>
-            ) : (
-              aiMessages.map((message, index) => (
-                <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                  <div
-                    className={`max-w-[90%] rounded-2xl px-3 py-2 sm:px-4 sm:py-3 ${
-                      message.role === "user"
-                        ? "bg-primary text-primary-foreground rounded-br-md"
-                        : "bg-secondary text-foreground rounded-bl-md"
-                    }`}
-                  >
-                    {message.role === "assistant" && (
-                      <div className="flex items-center gap-2 mb-1.5 sm:mb-2 pb-1.5 sm:pb-2 border-b border-border/50">
-                        <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
-                        <span className="text-[10px] sm:text-xs font-medium">AI Assistant</span>
-                      </div>
-                    )}
-                    <div className="text-[11px] sm:text-sm whitespace-pre-wrap leading-relaxed">
-                      {message.content.split("\n").map((line, i) => {
-                        const parts = line.split(/(\*\*[^*]+\*\*)/g)
-                        return (
-                          <p key={i} className={i > 0 ? "mt-1.5 sm:mt-2" : ""}>
-                            {parts.map((part, j) => {
-                              if (part.startsWith("**") && part.endsWith("**")) {
-                                return (
-                                  <strong key={j} className="font-semibold">
-                                    {part.slice(2, -2)}
-                                  </strong>
-                                )
-                              }
-                              return <span key={j}>{part}</span>
-                            })}
-                          </p>
-                        )
-                      })}
-                    </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 sm:h-10 sm:w-10 shrink-0"
+                onClick={() => setShowAIPanel(false)}
+              >
+                <X className="h-4 w-4 sm:h-5 sm:w-5" />
+              </Button>
+            </div>
+
+            {/* Market Context Banner */}
+            <div className="px-3 py-2 sm:px-4 sm:py-3 bg-secondary/50 border-b border-border">
+              <div className="flex items-center justify-between text-[10px] sm:text-xs">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Badge variant="secondary" className="text-[9px] sm:text-[10px]">
+                    {market.category}
+                  </Badge>
+                  <span className="text-muted-foreground">Yes: {market.yesPrice}¢</span>
+                  <span className={market.change >= 0 ? "text-success" : "text-danger"}>
+                    {market.change >= 0 ? "+" : ""}
+                    {market.change}%
+                  </span>
+                </div>
+                <Button variant="ghost" size="sm" className="h-5 sm:h-6 px-1.5 sm:px-2 text-[9px] sm:text-xs gap-1">
+                  <RefreshCw className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Messages Area */}
+            <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
+              {aiMessages.length === 0 ? (
+                <div className="text-center py-6 sm:py-8">
+                  <Sparkles className="h-8 w-8 sm:h-12 sm:w-12 mx-auto text-primary/50 mb-3 sm:mb-4" />
+                  <h4 className="font-medium text-foreground mb-2 text-sm sm:text-base">Ask me anything</h4>
+                  <p className="text-[11px] sm:text-sm text-muted-foreground mb-4 sm:mb-6">
+                    Real-time context about prices, volume, and activity.
+                  </p>
+                  <div className="space-y-1.5 sm:space-y-2">
+                    {quickPrompts.map((prompt, i) => (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          setAiInput(prompt)
+                          setTimeout(() => {
+                            const form = document.getElementById("ai-form") as HTMLFormElement
+                            form?.requestSubmit()
+                          }, 100)
+                        }}
+                        className="w-full text-left text-[11px] sm:text-sm p-2.5 sm:p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors text-muted-foreground hover:text-foreground"
+                      >
+                        {prompt}
+                      </button>
+                    ))}
                   </div>
                 </div>
-              ))
-            )}
-            {aiLoading && (
-              <div className="flex justify-start">
-                <div className="bg-secondary rounded-2xl rounded-bl-md px-3 py-2 sm:px-4 sm:py-3 flex items-center gap-2">
-                  <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin text-primary" />
-                  <span className="text-[11px] sm:text-sm text-muted-foreground">Analyzing...</span>
+              ) : (
+                aiMessages.map((message, index) => (
+                  <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+                    <div
+                      className={`max-w-[90%] rounded-2xl px-3 py-2 sm:px-4 sm:py-3 ${
+                        message.role === "user"
+                          ? "bg-primary text-primary-foreground rounded-br-md"
+                          : "bg-secondary text-foreground rounded-bl-md"
+                      }`}
+                    >
+                      {message.role === "assistant" && (
+                        <div className="flex items-center gap-2 mb-1.5 sm:mb-2 pb-1.5 sm:pb-2 border-b border-border/50">
+                          <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
+                          <span className="text-[10px] sm:text-xs font-medium">AI Assistant</span>
+                        </div>
+                      )}
+                      <div className="text-[11px] sm:text-sm whitespace-pre-wrap leading-relaxed">
+                        {message.content.split("\n").map((line, i) => {
+                          const parts = line.split(/(\*\*[^*]+\*\*)/g)
+                          return (
+                            <p key={i} className={i > 0 ? "mt-1.5 sm:mt-2" : ""}>
+                              {parts.map((part, j) => {
+                                if (part.startsWith("**") && part.endsWith("**")) {
+                                  return (
+                                    <strong key={j} className="font-semibold">
+                                      {part.slice(2, -2)}
+                                    </strong>
+                                  )
+                                }
+                                return <span key={j}>{part}</span>
+                              })}
+                            </p>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+              {aiLoading && (
+                <div className="flex justify-start">
+                  <div className="bg-secondary rounded-2xl rounded-bl-md px-3 py-2 sm:px-4 sm:py-3 flex items-center gap-2">
+                    <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin text-primary" />
+                    <span className="text-[11px] sm:text-sm text-muted-foreground">Analyzing...</span>
+                  </div>
                 </div>
-              </div>
-            )}
-            <div ref={aiMessagesEndRef} />
-          </div>
+              )}
+              <div ref={aiMessagesEndRef} />
+            </div>
 
-          {/* Input Area */}
-          <div className="p-3 sm:p-4 border-t border-border bg-card">
-            <form id="ai-form" onSubmit={handleAISubmit} className="flex gap-2">
-              <Input
-                value={aiInput}
-                onChange={(e) => setAiInput(e.target.value)}
-                placeholder="Ask about this market..."
-                className="flex-1 bg-secondary text-sm h-9 sm:h-10"
-                disabled={aiLoading}
-              />
-              <Button
-                type="submit"
-                size="icon"
-                className="h-9 w-9 sm:h-10 sm:w-10 shrink-0"
-                disabled={!aiInput.trim() || aiLoading}
-              >
-                <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              </Button>
-            </form>
+            {/* Input Area */}
+            <div className="p-3 sm:p-4 border-t border-border bg-card">
+              <form id="ai-form" onSubmit={handleAISubmit} className="flex gap-2">
+                <Input
+                  value={aiInput}
+                  onChange={(e) => setAiInput(e.target.value)}
+                  placeholder="Ask about this market..."
+                  className="flex-1 bg-secondary text-sm h-9 sm:h-10"
+                  disabled={aiLoading}
+                />
+                <Button
+                  type="submit"
+                  size="icon"
+                  className="h-9 w-9 sm:h-10 sm:w-10 shrink-0"
+                  disabled={!aiInput.trim() || aiLoading}
+                >
+                  <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                </Button>
+              </form>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Backdrop */}
       {showAIPanel && (
