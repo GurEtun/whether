@@ -11,8 +11,9 @@ export function generateStaticParams() {
   }))
 }
 
-export default function MarketPage({ params }: { params: { id: string } }) {
-  const market = getMarketById(params.id)
+export default async function MarketPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const market = getMarketById(id)
 
   if (!market) {
     notFound()
