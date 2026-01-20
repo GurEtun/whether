@@ -17,9 +17,9 @@ export default function FAQPage() {
         "You buy shares representing YES or NO outcomes for specific events. If your prediction is correct, your shares are redeemed for $1 each. The price reflects the market's probability estimate for that outcome.",
     },
     {
-      question: "What is DFlow?",
+      question: "What blockchain does Whether use?",
       answer:
-        "DFlow is the underlying infrastructure that powers Whether. It handles market discovery, order execution, position management, and settlement on Solana blockchain, allowing us to focus purely on delivering the best user experience.",
+        "Whether is built on Solana blockchain, powered by DFlow infrastructure. This provides fast, secure, and transparent on-chain execution with low fees.",
     },
     {
       question: "How do I get started?",
@@ -54,7 +54,7 @@ export default function FAQPage() {
     {
       question: "Is my money safe?",
       answer:
-        "Whether is built on DFlow's battle-tested infrastructure on Solana. Your funds are held in smart contracts, and you maintain custody through your wallet. Always do your own research and only trade what you can afford to lose.",
+        "Whether uses non-custodial, on-chain smart contracts on Solana. You maintain full custody through your wallet. All trades are transparent and verifiable on-chain. Always do your own research and only trade what you can afford to lose.",
     },
   ]
 
