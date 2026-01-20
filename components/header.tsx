@@ -17,7 +17,7 @@ export function Header() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
           <Link href="/" className="flex items-center">
-            <span className="text-2xl font-black tracking-tight text-white">whether</span>
+            <span className="text-2xl font-black tracking-tight text-primary italic">whether</span>
           </Link>
 
           {/* Desktop Navigation */}

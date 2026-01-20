@@ -5,33 +5,11 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { TrendingUp, TrendingDown, ArrowUpRight } from "lucide-react"
 import Link from "next/link"
-import { useDFlowMarkets } from "@/hooks/use-dflow-markets"
-
-// Fallback data when API is unavailable
-const fallbackTrendingData = [
-  { id: "trending-1", title: "BTC above $100K EOY 2026", yesPrice: 78, change: 12.4, category: "Crypto" },
-  { id: "trending-2", title: "US GDP growth > 3% in 2026", yesPrice: 41, change: 8.2, category: "Economics" },
-  { id: "trending-3", title: "iPhone SE 4 released by Q2", yesPrice: 89, change: 5.7, category: "Tech" },
-  { id: "trending-4", title: "Champions League Final: English team wins", yesPrice: 52, change: -2.1, category: "Sports" },
-  { id: "trending-5", title: "Oscars Best Picture: Sci-Fi wins", yesPrice: 28, change: 15.8, category: "Entertainment" },
-]
+import { getTrendingMarkets } from "@/lib/markets-data"
 
 export function TrendingMarkets() {
-  const { markets: dflowMarkets } = useDFlowMarkets("active")
-  
-  // Filter trending markets and take top 5
-  const trendingData = dflowMarkets.length > 0 
-    ? dflowMarkets.filter((m: { trending?: boolean }) => m.trending).slice(0, 5).map((m: { id: string; title: string; yesPrice: number; change: number; category: string }) => ({
-        id: m.id,
-        title: m.title,
-        yesPrice: m.yesPrice,
-        change: m.change,
-        category: m.category,
-      }))
-    : fallbackTrendingData
-  
-  // Ensure we always have some data
-  const displayData = trendingData.length > 0 ? trendingData : fallbackTrendingData
+  // Use static demo data from markets-data.ts
+  const displayData = getTrendingMarkets(5)
   return (
     <section className="border-y border-border bg-card/30 py-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

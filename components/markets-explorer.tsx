@@ -7,143 +7,9 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, TrendingUp, TrendingDown, Clock, Users, Flame, Grid3X3, List, Layers, Loader2 } from "lucide-react"
+import { Search, TrendingUp, TrendingDown, Clock, Users, Flame, Grid3X3, List, Layers } from "lucide-react"
 import Link from "next/link"
-import { useDFlowMarkets } from "@/hooks/use-dflow-markets"
-
-// Fallback markets for when API is unavailable
-const fallbackMarkets = [
-  {
-    id: "btc-150k",
-    title: "Will BTC reach $150K by March 2026?",
-    category: "Crypto",
-    series: "Crypto Milestones 2026",
-    yesPrice: 67,
-    change: 5.2,
-    volume: "$1.2M",
-    traders: 4521,
-    endDate: "Mar 31, 2026",
-    status: "active",
-    trending: true,
-  },
-  {
-    id: "fed-rate-cut",
-    title: "Will the Fed cut rates by June 2026?",
-    category: "Economics",
-    series: "Fed Policy 2026",
-    yesPrice: 72,
-    change: 3.2,
-    volume: "$892K",
-    traders: 2341,
-    endDate: "Jun 15, 2026",
-    status: "active",
-    trending: true,
-  },
-  {
-    id: "eth-flip",
-    title: "Will ETH flip BTC market cap in 2026?",
-    category: "Crypto",
-    series: "Crypto Milestones 2026",
-    yesPrice: 23,
-    change: -3.1,
-    volume: "$1.4M",
-    traders: 4521,
-    endDate: "Dec 31, 2026",
-    status: "active",
-    trending: true,
-  },
-  {
-    id: "ai-regulation",
-    title: "Major AI regulation bill passed in 2026?",
-    category: "Politics",
-    series: "Tech Policy 2026",
-    yesPrice: 58,
-    change: 8.7,
-    volume: "$567K",
-    traders: 1892,
-    endDate: "Dec 31, 2026",
-    status: "active",
-    trending: false,
-  },
-  {
-    id: "starship-orbital",
-    title: "SpaceX Starship orbital refueling by 2026?",
-    category: "Science & Tech",
-    series: "Space Milestones",
-    yesPrice: 45,
-    change: 12.3,
-    volume: "$678K",
-    traders: 2134,
-    endDate: "Dec 31, 2026",
-    status: "active",
-    trending: true,
-  },
-  {
-    id: "man-city-premier",
-    title: "Manchester City wins Premier League 25/26?",
-    category: "Sports",
-    series: "Premier League 25/26",
-    yesPrice: 34,
-    change: -1.5,
-    volume: "$1.1M",
-    traders: 5678,
-    endDate: "May 25, 2026",
-    status: "active",
-    trending: false,
-  },
-  {
-    id: "sol-500",
-    title: "Will Solana reach $500 by Q2 2026?",
-    category: "Crypto",
-    series: "Crypto Milestones 2026",
-    yesPrice: 41,
-    change: 6.8,
-    volume: "$432K",
-    traders: 1876,
-    endDate: "Jun 30, 2026",
-    status: "active",
-    trending: false,
-  },
-  {
-    id: "gpt5-release",
-    title: "GPT-5 released by OpenAI before July 2026?",
-    category: "Science & Tech",
-    series: "AI Milestones",
-    yesPrice: 78,
-    change: 2.1,
-    volume: "$234K",
-    traders: 987,
-    endDate: "Jul 1, 2026",
-    status: "active",
-    trending: false,
-  },
-  {
-    id: "super-bowl-chiefs",
-    title: "Will the Chiefs win Super Bowl LXI?",
-    category: "Sports",
-    series: "NFL 2026",
-    yesPrice: 28,
-    change: -2.3,
-    volume: "$823K",
-    traders: 3456,
-    endDate: "Feb 14, 2027",
-    status: "active",
-    trending: false,
-  },
-  {
-    id: "oscars-dune3",
-    title: "Will Dune 3 win Best Picture at 2027 Oscars?",
-    category: "Entertainment",
-    series: "Awards Season 2027",
-    yesPrice: 15,
-    change: 1.8,
-    volume: "$156K",
-    traders: 789,
-    endDate: "Mar 15, 2027",
-    status: "active",
-    trending: false,
-  },
-]
+import { markets as allMarketsData, type Market } from "@/lib/markets-data"
 
 const categories = ["All", "Crypto", "Politics", "Sports", "Economics", "Science & Tech", "Entertainment"]
 const statuses = ["All", "Active", "Closed", "Determined", "Finalized"]
@@ -157,12 +23,9 @@ export function MarketsExplorer({ initialCategory }: { initialCategory?: string 
   const [selectedStatus, setSelectedStatus] = useState("All")
   const [sortBy, setSortBy] = useState("trending")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
-  const { markets: dflowMarkets, isLoading } = useDFlowMarkets("active")
   
-  // Use DFlow markets if available, otherwise fallback
-  const allMarkets = dflowMarkets.length > 0 ? dflowMarkets : fallbackMarkets
-
-  const filteredMarkets = allMarkets.filter((market) => {
+  // Use static demo data from markets-data.ts
+  const filteredMarkets = allMarketsData.filter((market) => {
     const matchesSearch = market.title.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesCategory = selectedCategory === "All" || market.category === selectedCategory
     const matchesStatus = selectedStatus === "All" || market.status === selectedStatus.toLowerCase()
@@ -294,7 +157,7 @@ export function MarketsExplorer({ initialCategory }: { initialCategory?: string 
   )
 }
 
-function MarketCard({ market }: { market: (typeof fallbackMarkets)[0] }) {
+function MarketCard({ market }: { market: Market }) {
   const isPositive = market.change >= 0
 
   return (
@@ -376,7 +239,7 @@ function MarketCard({ market }: { market: (typeof fallbackMarkets)[0] }) {
   )
 }
 
-function MarketListItem({ market }: { market: (typeof fallbackMarkets)[0] }) {
+function MarketListItem({ market }: { market: Market }) {
   const isPositive = market.change >= 0
 
   return (

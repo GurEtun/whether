@@ -5,100 +5,15 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { TrendingUp, TrendingDown, Clock, Users, ArrowRight, Flame, Loader2 } from "lucide-react"
+import { TrendingUp, TrendingDown, Clock, Users, ArrowRight, Flame } from "lucide-react"
 import Link from "next/link"
-import { useDFlowMarkets } from "@/hooks/use-dflow-markets"
-
-// Fallback markets for when API is unavailable
-const fallbackMarkets = [
-  {
-    id: "market-1",
-    title: "Will the Fed cut rates by June 2026?",
-    category: "Economics",
-    yesPrice: 72,
-    change: 5.2,
-    volume: "$892K",
-    traders: 2341,
-    endDate: "Jun 15, 2026",
-    trending: true,
-  },
-  {
-    id: "market-2",
-    title: "Will ETH flip BTC market cap in 2026?",
-    category: "Crypto",
-    yesPrice: 23,
-    change: -3.1,
-    volume: "$1.4M",
-    traders: 4521,
-    endDate: "Dec 31, 2026",
-    trending: true,
-  },
-  {
-    id: "market-3",
-    title: "Will there be a major AI regulation bill passed in 2026?",
-    category: "Politics",
-    yesPrice: 58,
-    change: 8.7,
-    volume: "$567K",
-    traders: 1892,
-    endDate: "Dec 31, 2026",
-    trending: false,
-  },
-  {
-    id: "market-4",
-    title: "Will Taylor Swift announce a new album by Q2 2026?",
-    category: "Entertainment",
-    yesPrice: 81,
-    change: 2.1,
-    volume: "$234K",
-    traders: 3456,
-    endDate: "Jun 30, 2026",
-    trending: false,
-  },
-  {
-    id: "market-5",
-    title: "Will SpaceX Starship complete orbital refueling by 2026?",
-    category: "Science & Tech",
-    yesPrice: 45,
-    change: 12.3,
-    volume: "$678K",
-    traders: 2134,
-    endDate: "Dec 31, 2026",
-    trending: true,
-  },
-  {
-    id: "market-6",
-    title: "Will Manchester City win the Premier League 25/26?",
-    category: "Sports",
-    yesPrice: 34,
-    change: -1.5,
-    volume: "$1.1M",
-    traders: 5678,
-    endDate: "May 25, 2026",
-    trending: false,
-  },
-]
-
-interface Market {
-  id: string
-  title: string
-  category: string
-  yesPrice: number
-  change: number
-  volume: string
-  traders: number
-  endDate: string
-  trending?: boolean
-}
+import { getFeaturedMarkets, type Market } from "@/lib/markets-data"
 
 export function FeaturedMarkets() {
   const [sortBy, setSortBy] = useState("trending")
-  const { markets: dflowMarkets, isLoading } = useDFlowMarkets("active")
   
-  // Use DFlow markets if available, otherwise fallback
-  const featuredMarkets: Market[] = dflowMarkets.length > 0 
-    ? dflowMarkets.slice(0, 6) 
-    : fallbackMarkets
+  // Use static demo data from markets-data.ts
+  const featuredMarkets = getFeaturedMarkets(6)
 
   return (
     <section className="py-12">

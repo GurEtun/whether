@@ -6,6 +6,7 @@ import { TrendingMarkets } from "@/components/trending-markets"
 import { MarketSeries } from "@/components/market-series"
 import { DFlowFeatures } from "@/components/dflow-features"
 import { HowItWorks } from "@/components/how-it-works"
+import { DFlowAnimation } from "@/components/dflow-animation"
 import { Footer } from "@/components/footer"
 
 export default function Home() {
@@ -22,6 +23,7 @@ export default function Home() {
         <HowItWorks />
       </main>
       <Footer />
+      <DFlowAnimation />
     </div>
   )
 }

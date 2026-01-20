@@ -669,7 +669,6 @@ export function MarketDetail({ market }: { market: Market }) {
                 onChange={(e) => setAiInput(e.target.value)}
                 placeholder="Ask AI about this market..."
                 className="flex-1 bg-transparent border-none outline-none text-xs sm:text-sm text-foreground placeholder:text-muted-foreground min-w-0"
-                onFocus={() => setShowAIPanel(true)}
               />
               <Button
                 type="submit"

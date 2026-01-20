@@ -28,7 +28,7 @@ export function HeroSection() {
             </div>
 
             <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl xl:text-6xl text-balance">
-              Trade Outcomes, <span className="text-primary">Not Opinions</span>
+              Trade Outcomes, <span className="text-primary">{"Understand why"}</span>
             </h1>
 
             <p className="max-w-lg text-base sm:text-lg text-muted-foreground text-pretty">
