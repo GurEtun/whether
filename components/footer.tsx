@@ -8,7 +8,7 @@ export function Footer() {
           {/* Brand */}
           <div className="md:col-span-1">
             <Link href="/" className="inline-flex items-center">
-              <span className="text-xl font-black tracking-tight text-primary italic">whether</span>
+              <span className="text-xl font-black tracking-tight text-primary italic">Whether</span>
             </Link>
             <p className="mt-4 text-sm text-muted-foreground">
               Trade real-world outcomes. Understand the market behind them.
