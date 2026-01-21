@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import { useEffect } from "react"
 import dynamic from "next/dynamic"
 import { Loader2 } from "lucide-react"
 
@@ -34,5 +35,24 @@ const DynamicContextProviderComponent = dynamic(
 )
 
 export function DynamicProvider({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    // Suppress Dynamic SDK fetch errors in preview environments
+    const originalError = console.error
+    console.error = (...args) => {
+      if (
+        args[0]?.includes?.("Failed to fetch") ||
+        args[0]?.message?.includes?.("Failed to fetch")
+      ) {
+        // Silently ignore Dynamic SDK fetch errors in preview
+        return
+      }
+      originalError(...args)
+    }
+    
+    return () => {
+      console.error = originalError
+    }
+  }, [])
+  
   return <DynamicContextProviderComponent>{children}</DynamicContextProviderComponent>
 }

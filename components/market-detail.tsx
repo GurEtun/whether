@@ -1,7 +1,5 @@
 "use client"
 
-import type React from "react"
-
 import { useState, useRef, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -46,12 +44,11 @@ export function MarketDetail({ market }: { market: Market }) {
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [priorityFee, setPriorityFee] = useState<"normal" | "fast" | "instant">("normal")
 
-  const [showAIPanel, setShowAIPanel] = useState(false)
-  const [aiMessages, setAiMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([])
   const [aiInput, setAiInput] = useState("")
+  const [aiMessages, setAiMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([])
   const [aiLoading, setAiLoading] = useState(false)
-  const [newComment, setNewComment] = useState("")
   const aiMessagesEndRef = useRef<HTMLDivElement>(null)
+  const [newComment, setNewComment] = useState("")
 
   const yesPrice = market.yesPrice / 100
   const noPrice = market.noPrice / 100
@@ -65,7 +62,7 @@ export function MarketDetail({ market }: { market: Market }) {
     instant: "0.001 SOL",
   }
 
-  const [comments, setComments] = useState([
+  const comments = [
     {
       id: 1,
       user: "CryptoTrader99",
@@ -93,7 +90,7 @@ export function MarketDetail({ market }: { market: Market }) {
       likes: 24,
       replies: 7,
     },
-  ])
+  ]
 
   useEffect(() => {
     aiMessagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -105,46 +102,18 @@ export function MarketDetail({ market }: { market: Market }) {
 
     const userMessage = aiInput.trim()
     setAiInput("")
-    setAiMessages((prev) => [...prev, { role: "user", content: userMessage }])
+    setShowAIPanel(true)
+    setAiMessages(prev => [...prev, { role: "user", content: userMessage }])
     setAiLoading(true)
 
-    // Simulate AI response with market context
+    // Simple mock response - replace with real AI later
     setTimeout(() => {
-      const contextualResponse = generateContextualResponse(userMessage, market)
-      setAiMessages((prev) => [...prev, { role: "assistant", content: contextualResponse }])
+      setAiMessages(prev => [...prev, { 
+        role: "assistant", 
+        content: `I can help analyze **${market.title}**. The current Yes price is ${market.yesPrice}¢ (${market.yesPrice}% probability). Ask me about price trends, volume analysis, or resolution details.`
+      }])
       setAiLoading(false)
-    }, 1500)
-  }
-
-  const generateContextualResponse = (query: string, market: Market): string => {
-    const queryLower = query.toLowerCase()
-
-    if (queryLower.includes("price") || queryLower.includes("probability")) {
-      return `Based on current market data, **${market.title}** is trading at:\n\n• **Yes:** ${market.yesPrice}¢ (${market.yesPrice}% implied probability)\n• **No:** ${market.noPrice}¢ (${market.noPrice}% implied probability)\n\nThe 24h change is ${market.change >= 0 ? "+" : ""}${market.change}%, indicating ${market.change >= 0 ? "bullish" : "bearish"} sentiment.`
-    }
-
-    if (queryLower.includes("volume") || queryLower.includes("liquidity")) {
-      return `**Volume Analysis for ${market.title}:**\n\n• Total Volume: ${market.totalVolume}\n• Active Traders: ${market.traders.toLocaleString()}\n\nThis indicates ${market.traders > 500 ? "high" : "moderate"} market activity. Higher volume generally means better price discovery and tighter spreads.`
-    }
-
-    if (queryLower.includes("when") || queryLower.includes("end") || queryLower.includes("resolve")) {
-      return `**Resolution Details:**\n\n• End Date: ${market.endDate}\n• Status: ${market.status}\n• Resolution Source: ${market.resolution}\n\nThe market will be resolved based on official data from the specified source.`
-    }
-
-    if (
-      queryLower.includes("should") ||
-      queryLower.includes("buy") ||
-      queryLower.includes("trade") ||
-      queryLower.includes("recommend")
-    ) {
-      return `I can provide market analysis, but I cannot give financial advice.\n\n**Current Market State:**\n• Yes Price: ${market.yesPrice}¢\n• No Price: ${market.noPrice}¢\n• Trend: ${market.change >= 0 ? "Upward" : "Downward"} (${market.change}%)\n\nConsider your risk tolerance and do your own research before trading.`
-    }
-
-    if (queryLower.includes("news") || queryLower.includes("update") || queryLower.includes("latest")) {
-      return `**Latest Updates for ${market.title}:**\n\n📊 Market is currently **${market.status}** with ${market.traders.toLocaleString()} participants.\n\n📈 Recent price movement: ${market.change >= 0 ? "+" : ""}${market.change}% in 24h\n\n💬 ${comments.length} community discussions active\n\nI recommend checking the resolution source (${market.resolution}) for the most current information.`
-    }
-
-    return `**Market Summary: ${market.title}**\n\n• Current Yes Price: ${market.yesPrice}¢\n• Current No Price: ${market.noPrice}¢\n• 24h Change: ${market.change >= 0 ? "+" : ""}${market.change}%\n• Volume: ${market.totalVolume}\n• Traders: ${market.traders.toLocaleString()}\n• Ends: ${market.endDate}\n• Series: ${market.series}\n\nAsk me about price analysis, volume trends, or resolution details!`
+    }, 1000)
   }
 
   const handleAddComment = () => {
@@ -170,6 +139,8 @@ export function MarketDetail({ market }: { market: Market }) {
     "When does this market end?",
     "What's the latest news?",
   ]
+
+  const [showAIPanel, setShowAIPanel] = useState(false)
 
   return (
     <>
@@ -732,7 +703,7 @@ export function MarketDetail({ market }: { market: Market }) {
 
             {/* Messages Area */}
             <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
-              {aiMessages.length === 0 ? (
+              {messages.length === 0 ? (
                 <div className="text-center py-6 sm:py-8">
                   <Sparkles className="h-8 w-8 sm:h-12 sm:w-12 mx-auto text-primary/50 mb-3 sm:mb-4" />
                   <h4 className="font-medium text-foreground mb-2 text-sm sm:text-base">Ask me anything</h4>
@@ -758,7 +729,7 @@ export function MarketDetail({ market }: { market: Market }) {
                   </div>
                 </div>
               ) : (
-                aiMessages.map((message, index) => (
+                messages.map((message, index) => (
                   <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
                     <div
                       className={`max-w-[90%] rounded-2xl px-3 py-2 sm:px-4 sm:py-3 ${
@@ -773,25 +744,25 @@ export function MarketDetail({ market }: { market: Market }) {
                           <span className="text-[10px] sm:text-xs font-medium">AI Assistant</span>
                         </div>
                       )}
-                      <div className="text-[11px] sm:text-sm whitespace-pre-wrap leading-relaxed">
-                        {message.content.split("\n").map((line, i) => {
-                          const parts = line.split(/(\*\*[^*]+\*\*)/g)
-                          return (
-                            <p key={i} className={i > 0 ? "mt-1.5 sm:mt-2" : ""}>
-                              {parts.map((part, j) => {
-                                if (part.startsWith("**") && part.endsWith("**")) {
-                                  return (
-                                    <strong key={j} className="font-semibold">
-                                      {part.slice(2, -2)}
-                                    </strong>
-                                  )
-                                }
-                                return <span key={j}>{part}</span>
-                              })}
-                            </p>
-                          )
-                        })}
-                      </div>
+                  <div className="text-[11px] sm:text-sm whitespace-pre-wrap leading-relaxed">
+                    {message.content.split("\n").map((line, i) => {
+                      const segments = line.split(/(\*\*[^*]+\*\*)/g)
+                      return (
+                        <p key={i} className={i > 0 ? "mt-1.5 sm:mt-2" : ""}>
+                          {segments.map((segment, j) => {
+                            if (segment.startsWith("**") && segment.endsWith("**")) {
+                              return (
+                                <strong key={j} className="font-semibold">
+                                  {segment.slice(2, -2)}
+                                </strong>
+                              )
+                            }
+                            return <span key={j}>{segment}</span>
+                          })}
+                        </p>
+                      )
+                    })}
+                  </div>
                     </div>
                   </div>
                 ))
