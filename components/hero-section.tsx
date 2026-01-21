@@ -19,12 +19,8 @@ export function HeroSection() {
           {/* Content */}
           <div className="space-y-6 sm:space-y-8">
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-              <Badge variant="secondary" className="gap-1.5 border-primary/20 bg-primary/10 text-primary sm:gap-2">
-                <Zap className="h-3 w-3" /> Powered by DFlow
-              </Badge>
-              <Badge variant="outline" className="gap-1 border-border text-muted-foreground sm:gap-1.5">
-                <Activity className="h-3 w-3" /> Solana
-              </Badge>
+              
+              
             </div>
 
             <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl xl:text-6xl text-balance">

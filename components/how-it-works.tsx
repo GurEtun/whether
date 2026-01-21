@@ -60,10 +60,7 @@ export function HowItWorks() {
 
         {/* DFlow badge */}
         <div className="mt-12 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 mb-6">
-            <Zap className="h-4 w-4 text-primary" />
-            <span className="text-sm text-primary font-medium">Powered by DFlow on Solana</span>
-          </div>
+          
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link href="/markets">
               <Button
@@ -74,9 +71,7 @@ export function HowItWorks() {
               </Button>
             </Link>
             <Link href="https://pond.dflow.net" target="_blank">
-              <Button size="lg" variant="outline" className="gap-2 bg-transparent w-full sm:w-auto">
-                View DFlow Docs
-              </Button>
+              
             </Link>
           </div>
         </div>
