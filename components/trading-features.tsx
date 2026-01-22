@@ -10,7 +10,7 @@ const features = [
   {
     icon: Route,
     title: "Smart Order Routing",
-    description: "DFlow automatically routes orders for best execution across liquidity sources.",
+    description: "Automatically route orders for best execution across liquidity sources.",
     badge: "Trading",
   },
   {
@@ -45,7 +45,7 @@ const features = [
   },
 ]
 
-export function DFlowFeatures() {
+export function TradingFeatures() {
   return (
     <section className="border-y border-border bg-card/30 py-12 sm:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -60,7 +60,7 @@ export function DFlowFeatures() {
             Non-Custodial, On-Chain Execution
           </h2>
           <p className="max-w-2xl mx-auto text-sm sm:text-base text-muted-foreground px-4">
-            Built on DFlow&apos;s prediction market infrastructure - transparent, secure, and fully on-chain with best execution on Solana.
+            Transparent, secure, and fully on-chain prediction market trading with best execution on Solana.
           </p>
         </div>
 

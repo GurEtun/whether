@@ -9,7 +9,7 @@ export default function FAQPage() {
     {
       question: "What is Whether?",
       answer:
-        "Whether is a decentralized prediction market platform powered by DFlow infrastructure. It allows you to trade on the outcomes of real-world events across politics, sports, crypto, and more.",
+        "Whether is a social prediction market platform built on Solana. It allows you to trade on the outcomes of real-world events across politics, sports, crypto, and more, with AI-powered analysis and community discussions.",
     },
     {
       question: "How does prediction market trading work?",
@@ -19,7 +19,7 @@ export default function FAQPage() {
     {
       question: "What blockchain does Whether use?",
       answer:
-        "Whether is built on Solana blockchain, powered by DFlow infrastructure. This provides fast, secure, and transparent on-chain execution with low fees.",
+        "Whether is built on Solana blockchain. This provides fast, secure, and transparent on-chain execution with low fees.",
     },
     {
       question: "How do I get started?",
@@ -85,14 +85,14 @@ export default function FAQPage() {
 
         <Card className="mt-8 border-border bg-gradient-to-br from-primary/10 to-purple-500/10 p-6 text-center">
           <h3 className="mb-2 text-xl font-bold text-foreground">Still have questions?</h3>
-          <p className="mb-4 text-muted-foreground">Check out the DFlow documentation for technical details</p>
+          <p className="mb-4 text-muted-foreground">Join our community for support and discussions</p>
           <a
-            href="https://pond.dflow.net"
+            href="https://discord.gg"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-2 font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Visit DFlow Docs
+            Join Discord
           </a>
         </Card>
       </main>

@@ -10,8 +10,8 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Whether | Prediction Markets Powered by DFlow",
-  description: "Trade on real-world events with the best execution on Solana. Powered by DFlow infrastructure.",
+  title: "Whether | Social Prediction Markets on Solana",
+  description: "Trade on real-world events with AI-powered analysis and community insights. Built on Solana.",
   generator: "v0.app",
 }
 

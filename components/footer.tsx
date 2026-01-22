@@ -67,8 +67,8 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="https://pond.dflow.net" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">
-                  Developer Docs
+                <Link href="/faq" className="hover:text-foreground">
+                  Help Center
                 </Link>
               </li>
             </ul>

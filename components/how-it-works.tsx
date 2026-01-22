@@ -58,22 +58,15 @@ export function HowItWorks() {
           })}
         </div>
 
-        {/* DFlow badge */}
         <div className="mt-12 text-center">
-          
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/markets">
-              <Button
-                size="lg"
-                className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 w-full sm:w-auto"
-              >
-                Start Trading <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-            <Link href="https://pond.dflow.net" target="_blank">
-              
-            </Link>
-          </div>
+          <Link href="/markets">
+            <Button
+              size="lg"
+              className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              Start Trading <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
         </div>
       </div>
     </section>

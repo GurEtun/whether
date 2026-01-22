@@ -188,7 +188,7 @@ export function Portfolio() {
           </CardContent>
         </Card>
 
-        {/* Redeemable - DFlow specific */}
+        {/* Redeemable */}
         <Card className="border-border bg-card border-success/30 col-span-2 lg:col-span-1">
           <CardContent className="pt-4 sm:pt-6">
             <div className="flex items-center justify-between">

@@ -28,7 +28,7 @@ export function HeroSection() {
             </h1>
 
             <p className="max-w-lg text-base sm:text-lg text-muted-foreground text-pretty">
-              Whether is a social prediction trading app where people trade on real-world events, discuss their reasoning, and get AI-powered market analysis — powered by DFlow on Solana.
+              Whether is a social prediction trading app where people trade on real-world events, discuss their reasoning, and get AI-powered market analysis — built on Solana.
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">

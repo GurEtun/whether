@@ -5,9 +5,9 @@ import { FeaturedMarkets } from "@/components/featured-markets"
 import { SocialAIFeatures } from "@/components/social-ai-features"
 import { TrendingMarkets } from "@/components/trending-markets"
 import { MarketSeries } from "@/components/market-series"
-import { DFlowFeatures } from "@/components/dflow-features"
+import { TradingFeatures } from "@/components/trading-features"
 import { HowItWorks } from "@/components/how-it-works"
-import { DFlowAnimation } from "@/components/dflow-animation"
+import { WhetherAnimation } from "@/components/whether-animation"
 import { Footer } from "@/components/footer"
 
 export default function Home() {
@@ -21,11 +21,11 @@ export default function Home() {
         <SocialAIFeatures />
         <TrendingMarkets />
         <MarketSeries />
-        <DFlowFeatures />
+        <TradingFeatures />
         <HowItWorks />
       </main>
       <Footer />
-      <DFlowAnimation />
+      <WhetherAnimation />
     </div>
   )
 }

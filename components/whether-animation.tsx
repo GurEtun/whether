@@ -4,7 +4,7 @@ import React from "react"
 
 import { useEffect, useRef, useState } from "react"
 
-export function DFlowAnimation() {
+export function WhetherAnimation() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [error, setError] = useState<string | null>(null)
 

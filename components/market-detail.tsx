@@ -1,5 +1,7 @@
 "use client"
 
+import React from "react"
+
 import { useState, useRef, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -34,6 +36,15 @@ import {
   RefreshCw,
 } from "lucide-react"
 import type { Market } from "@/lib/markets-data"
+import { PriceChart } from "@/components/price-chart"
+import { RecentTrades } from "@/components/recent-trades"
+import { useLiveMarketData } from "@/hooks/use-market-data"
+
+const priorityFees = {
+  normal: "Normal Fee",
+  fast: "Fast Fee",
+  instant: "Instant Fee",
+}
 
 export function MarketDetail({ market }: { market: Market }) {
   const [selectedOutcome, setSelectedOutcome] = useState<"yes" | "no">("yes")
@@ -44,25 +55,21 @@ export function MarketDetail({ market }: { market: Market }) {
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [priorityFee, setPriorityFee] = useState<"normal" | "fast" | "instant">("normal")
 
+  // Live market data from Jupiter API
+  const { data: liveData, isLoading: isLiveLoading } = useLiveMarketData(market.id)
+  
+  // Use live data if available, fallback to static data
+  const currentYesPrice = liveData?.yesPrice ?? market.yesPrice
+  const currentNoPrice = liveData?.noPrice ?? market.noPrice
+  const currentChange = liveData?.priceChange24h ?? market.change
+  const currentVolume = liveData?.totalVolume ? `$${(liveData.totalVolume / 1000000).toFixed(1)}M` : market.totalVolume
+
   const [aiInput, setAiInput] = useState("")
   const [aiMessages, setAiMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([])
   const [aiLoading, setAiLoading] = useState(false)
   const aiMessagesEndRef = useRef<HTMLDivElement>(null)
   const [newComment, setNewComment] = useState("")
-
-  const yesPrice = market.yesPrice / 100
-  const noPrice = market.noPrice / 100
-  const selectedPrice = selectedOutcome === "yes" ? yesPrice : noPrice
-  const shares = amount ? Number.parseFloat(amount) / selectedPrice : 0
-  const potentialProfit = shares - Number.parseFloat(amount || "0")
-
-  const priorityFees = {
-    normal: "0.00001 SOL",
-    fast: "0.0001 SOL",
-    instant: "0.001 SOL",
-  }
-
-  const comments = [
+  const [comments, setComments] = useState([
     {
       id: 1,
       user: "CryptoTrader99",
@@ -90,7 +97,12 @@ export function MarketDetail({ market }: { market: Market }) {
       likes: 24,
       replies: 7,
     },
-  ]
+  ])
+
+  const [messages, setMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([])
+  const [shares, setShares] = useState(0)
+  const [selectedPrice, setSelectedPrice] = useState(0)
+  const [potentialProfit, setPotentialProfit] = useState(0)
 
   useEffect(() => {
     aiMessagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -110,7 +122,7 @@ export function MarketDetail({ market }: { market: Market }) {
     setTimeout(() => {
       setAiMessages(prev => [...prev, { 
         role: "assistant", 
-        content: `I can help analyze **${market.title}**. The current Yes price is ${market.yesPrice}¢ (${market.yesPrice}% probability). Ask me about price trends, volume analysis, or resolution details.`
+        content: `I can help analyze **${market.title}**. The current Yes price is ${currentYesPrice}¢ (${currentYesPrice}% probability). Ask me about price trends, volume analysis, or resolution details.`
       }])
       setAiLoading(false)
     }, 1000)
@@ -192,22 +204,25 @@ export function MarketDetail({ market }: { market: Market }) {
               <CardHeader className="pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-center gap-2 sm:gap-4">
-                    <div>
-                      <p className="text-[10px] sm:text-sm text-muted-foreground">Yes Price</p>
-                      <p className="text-lg sm:text-3xl font-bold text-success">{market.yesPrice}¢</p>
-                    </div>
+<div>
+                    <p className="text-[10px] sm:text-sm text-muted-foreground flex items-center gap-1">
+                      Yes Price
+                      {isLiveLoading && <Loader2 className="h-2.5 w-2.5 animate-spin" />}
+                    </p>
+                    <p className="text-lg sm:text-3xl font-bold text-success">{currentYesPrice}¢</p>
+                  </div>
                     <div
                       className={`flex items-center gap-1 rounded-full px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-sm font-medium ${
-                        market.change >= 0 ? "bg-success/10 text-success" : "bg-danger/10 text-danger"
-                      }`}
-                    >
-                      {market.change >= 0 ? (
-                        <TrendingUp className="h-2.5 w-2.5 sm:h-3 sm:w-3 shrink-0" />
-                      ) : (
-                        <TrendingDown className="h-2.5 w-2.5 sm:h-3 sm:w-3 shrink-0" />
-                      )}
-                      {market.change >= 0 ? "+" : ""}
-                      {market.change}%
+currentChange >= 0 ? "bg-success/10 text-success" : "bg-danger/10 text-danger"
+                    }`}
+                  >
+                    {currentChange >= 0 ? (
+                      <TrendingUp className="h-2.5 w-2.5 sm:h-3 sm:w-3 shrink-0" />
+                    ) : (
+                      <TrendingDown className="h-2.5 w-2.5 sm:h-3 sm:w-3 shrink-0" />
+                    )}
+                    {currentChange >= 0 ? "+" : ""}
+                    {currentChange}%
                     </div>
                   </div>
                   <div className="flex gap-1.5 sm:gap-2">
@@ -220,14 +235,8 @@ export function MarketDetail({ market }: { market: Market }) {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
-                <div className="flex h-[120px] sm:h-[200px] lg:h-[250px] items-center justify-center rounded-lg bg-secondary/50">
-                  <div className="text-center text-muted-foreground px-4">
-                    <TrendingUp className="mx-auto mb-2 h-5 w-5 sm:h-10 sm:w-10 opacity-50" />
-                    <p className="text-[10px] sm:text-sm">Price chart powered by DFlow</p>
-                    <p className="text-[9px] sm:text-xs">Real-time data via WebSocket</p>
-                  </div>
-                </div>
+<CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+                <PriceChart marketId={market.id} title="Price History" />
               </CardContent>
             </Card>
 
@@ -417,7 +426,7 @@ export function MarketDetail({ market }: { market: Market }) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="gap-1 text-[10px] sm:text-xs text-muted-foreground h-6 sm:h-8 px-2"
+                    className="gap-1 text-[10px] sm:text-xs text-muted-foreground h-6 sm:h-8 px-1"
                     onClick={() => setShowAdvanced(!showAdvanced)}
                   >
                     <Settings2 className="h-3 w-3" />
@@ -438,7 +447,7 @@ export function MarketDetail({ market }: { market: Market }) {
                     onClick={() => setSelectedOutcome("yes")}
                   >
                     <span className="text-sm sm:text-lg font-bold">Yes</span>
-                    <span className="text-[10px] sm:text-xs opacity-80">{market.yesPrice}¢</span>
+                    <span className="text-[10px] sm:text-xs opacity-80">{currentYesPrice}¢</span>
                   </Button>
                   <Button
                     variant={selectedOutcome === "no" ? "default" : "outline"}
@@ -450,7 +459,7 @@ export function MarketDetail({ market }: { market: Market }) {
                     onClick={() => setSelectedOutcome("no")}
                   >
                     <span className="text-sm sm:text-lg font-bold">No</span>
-                    <span className="text-[10px] sm:text-xs opacity-80">{market.noPrice}¢</span>
+                    <span className="text-[10px] sm:text-xs opacity-80">{currentNoPrice}¢</span>
                   </Button>
                 </div>
 
@@ -744,25 +753,25 @@ export function MarketDetail({ market }: { market: Market }) {
                           <span className="text-[10px] sm:text-xs font-medium">AI Assistant</span>
                         </div>
                       )}
-                  <div className="text-[11px] sm:text-sm whitespace-pre-wrap leading-relaxed">
-                    {message.content.split("\n").map((line, i) => {
-                      const segments = line.split(/(\*\*[^*]+\*\*)/g)
-                      return (
-                        <p key={i} className={i > 0 ? "mt-1.5 sm:mt-2" : ""}>
-                          {segments.map((segment, j) => {
-                            if (segment.startsWith("**") && segment.endsWith("**")) {
-                              return (
-                                <strong key={j} className="font-semibold">
-                                  {segment.slice(2, -2)}
-                                </strong>
-                              )
-                            }
-                            return <span key={j}>{segment}</span>
-                          })}
-                        </p>
-                      )
-                    })}
-                  </div>
+                      <div className="text-[11px] sm:text-sm whitespace-pre-wrap leading-relaxed">
+                        {message.content.split("\n").map((line, i) => {
+                          const segments = line.split(/(\*\*[^*]+\*\*)/g)
+                          return (
+                            <p key={i} className={i > 0 ? "mt-1.5 sm:mt-2" : ""}>
+                              {segments.map((segment, j) => {
+                                if (segment.startsWith("**") && segment.endsWith("**")) {
+                                  return (
+                                    <strong key={j} className="font-semibold">
+                                      {segment.slice(2, -2)}
+                                    </strong>
+                                  )
+                                }
+                                return <span key={j}>{segment}</span>
+                              })}
+                            </p>
+                          )
+                        })}
+                      </div>
                     </div>
                   </div>
                 ))
@@ -904,61 +913,6 @@ function OrderBook() {
             <span className="relative text-success font-medium">{bid.price}¢</span>
             <span className="relative text-right text-foreground">{bid.size.toLocaleString()}</span>
             <span className="relative text-right text-muted-foreground">{bid.total.toLocaleString()}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function RecentTrades() {
-  const trades = [
-    { type: "buy", outcome: "Yes", price: 67, amount: 150, time: "2 min ago", execution: "Sync" },
-    { type: "sell", outcome: "Yes", price: 66, amount: 300, time: "5 min ago", execution: "Async" },
-    { type: "buy", outcome: "No", price: 34, amount: 200, time: "8 min ago", execution: "Sync" },
-    { type: "buy", outcome: "Yes", price: 65, amount: 500, time: "12 min ago", execution: "Async" },
-    { type: "sell", outcome: "No", price: 35, amount: 100, time: "15 min ago", execution: "Sync" },
-  ]
-
-  return (
-    <div className="space-y-3 sm:space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-xs sm:text-sm font-medium text-foreground">Recent Trades</h3>
-        <Button variant="ghost" size="sm" className="gap-1 text-[10px] sm:text-xs h-6 sm:h-8 px-2">
-          <ExternalLink className="h-3 w-3" />
-          <span className="hidden sm:inline">View on Explorer</span>
-        </Button>
-      </div>
-
-      {/* Trades */}
-      <div className="space-y-1.5 sm:space-y-2">
-        {trades.map((trade, i) => (
-          <div
-            key={i}
-            className="flex items-center justify-between rounded-lg bg-secondary/50 px-2.5 py-2 sm:px-4 sm:py-3"
-          >
-            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-              <div
-                className={`h-6 w-6 sm:h-8 sm:w-8 rounded-full flex items-center justify-center shrink-0 ${
-                  trade.type === "buy" ? "bg-success/10 text-success" : "bg-danger/10 text-danger"
-                }`}
-              >
-                {trade.type === "buy" ? (
-                  <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
-                ) : (
-                  <TrendingDown className="h-3 w-3 sm:h-4 sm:w-4" />
-                )}
-              </div>
-              <div className="min-w-0">
-                <p className="text-[11px] sm:text-sm font-medium text-foreground">
-                  {trade.type === "buy" ? "Bought" : "Sold"} {trade.outcome}
-                </p>
-                <p className="text-[9px] sm:text-xs text-muted-foreground truncate">
-                  {trade.price}¢ • ${trade.amount} • {trade.execution}
-                </p>
-              </div>
-            </div>
-            <span className="text-[9px] sm:text-xs text-muted-foreground whitespace-nowrap shrink-0">{trade.time}</span>
           </div>
         ))}
       </div>

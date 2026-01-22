@@ -40,7 +40,7 @@ export function MarketsExplorer({ initialCategory }: { initialCategory?: string 
           {selectedCategory === "All" ? "Explore Markets" : `${selectedCategory} Markets`}
         </h1>
         <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
-          Discover prediction markets powered by DFlow infrastructure
+          Discover prediction markets on Solana
         </p>
       </div>
 

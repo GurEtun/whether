@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { ChevronRight, Layers, TrendingUp } from "lucide-react"
 import Link from "next/link"
 
-// DFlow organizes markets into Series > Events > Markets
+// Markets are organized into Series > Events > Markets
 const seriesData = [
   {
     id: "us-elections-2026",
