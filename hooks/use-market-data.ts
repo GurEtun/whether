@@ -19,8 +19,8 @@ export interface LiveMarketData {
 
 export interface PriceHistoryPoint {
   timestamp: number
-  yesPrice: number
-  noPrice: number
+  yesPrice: string | number
+  noPrice: string | number
   volume?: number
 }
 
@@ -49,8 +49,10 @@ export function useLiveMarketData(marketId: string | undefined, refreshInterval 
     fetcher,
     {
       refreshInterval,
-      revalidateOnFocus: true,
+      revalidateOnFocus: false,
       dedupingInterval: 2000,
+      errorRetryCount: 3,
+      errorRetryInterval: 5000,
     }
   )
 
@@ -67,15 +69,17 @@ export function useLiveMarketData(marketId: string | undefined, refreshInterval 
  */
 export function usePriceHistory(
   marketId: string | undefined,
-  resolution: "1m" | "5m" | "15m" | "1h" | "4h" | "1d" = "1h",
+  resolution: "15m" | "1h" | "4h" | "1d" | "1w" = "1h",
   limit = 100
 ) {
   const { data, error, isLoading, mutate } = useSWR<{ prices: PriceHistoryPoint[] }>(
     marketId ? `/api/jup/markets/${marketId}/price-history?resolution=${resolution}&limit=${limit}` : null,
     fetcher,
     {
-      refreshInterval: 30000, // Refresh every 30 seconds
-      revalidateOnFocus: true,
+      refreshInterval: 30000,
+      revalidateOnFocus: false,
+      errorRetryCount: 3,
+      errorRetryInterval: 5000,
     }
   )
 
@@ -96,7 +100,9 @@ export function useRecentTrades(marketId: string | undefined, limit = 20) {
     fetcher,
     {
       refreshInterval: 10000,
-      revalidateOnFocus: true,
+      revalidateOnFocus: false,
+      errorRetryCount: 3,
+      errorRetryInterval: 5000,
     }
   )
 
@@ -117,7 +123,9 @@ export function useOrderbook(marketId: string | undefined, depth = 10) {
     fetcher,
     {
       refreshInterval: 3000,
-      revalidateOnFocus: true,
+      revalidateOnFocus: false,
+      errorRetryCount: 3,
+      errorRetryInterval: 5000,
     }
   )
 
