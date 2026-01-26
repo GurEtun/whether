@@ -204,13 +204,20 @@ export function MarketDetail({ market }: { market: Market }) {
               <CardHeader className="pb-2 px-3 sm:px-6 pt-3 sm:pt-6">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-center gap-2 sm:gap-4">
-<div>
-                    <p className="text-[10px] sm:text-sm text-muted-foreground flex items-center gap-1">
-                      Yes Price
-                      {isLiveLoading && <Loader2 className="h-2.5 w-2.5 animate-spin" />}
-                    </p>
-                    <p className="text-lg sm:text-3xl font-bold text-success">{currentYesPrice}¢</p>
-                  </div>
+                    <div>
+                      <p className="text-[10px] sm:text-sm text-muted-foreground flex items-center gap-1">
+                        Yes Price
+                        {isLiveLoading && <Loader2 className="h-2.5 w-2.5 animate-spin" />}
+                      </p>
+                      <p className="text-lg sm:text-3xl font-bold text-success">{currentYesPrice}¢</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] sm:text-sm text-muted-foreground flex items-center gap-1">
+                        No Price
+                        {isLiveLoading && <Loader2 className="h-2.5 w-2.5 animate-spin" />}
+                      </p>
+                      <p className="text-lg sm:text-3xl font-bold text-danger">{currentNoPrice}¢</p>
+                    </div>
                     <div
                       className={`flex items-center gap-1 rounded-full px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-sm font-medium ${
 currentChange >= 0 ? "bg-success/10 text-success" : "bg-danger/10 text-danger"
