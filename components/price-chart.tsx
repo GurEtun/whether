@@ -118,7 +118,7 @@ export function PriceChart({ marketId, title = "Price History" }: PriceChartProp
                 <XAxis
                   dataKey="timestamp"
                   tickFormatter={formatXAxis}
-                  stroke="hsl(var(--muted-foreground))"
+                  stroke="hsl(var(--foreground))"
                   fontSize={11}
                   tickLine={false}
                   axisLine={false}
@@ -126,7 +126,7 @@ export function PriceChart({ marketId, title = "Price History" }: PriceChartProp
                 <YAxis
                   domain={[yMin, yMax]}
                   tickFormatter={(v) => `${v}¢`}
-                  stroke="hsl(var(--muted-foreground))"
+                  stroke="hsl(var(--foreground))"
                   fontSize={11}
                   tickLine={false}
                   axisLine={false}
@@ -162,11 +162,11 @@ export function PriceChart({ marketId, title = "Price History" }: PriceChartProp
         <div className="flex items-center justify-center gap-8 mt-4 text-xs">
           <div className="flex items-center gap-2">
             <div className="h-2.5 w-2.5 rounded-full bg-green-500 shadow-sm" />
-            <span className="text-muted-foreground font-medium">Yes Price</span>
+            <span className="text-foreground font-medium">Yes Price</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="h-2.5 w-2.5 rounded-full bg-red-500 shadow-sm" />
-            <span className="text-muted-foreground font-medium">No Price</span>
+            <span className="text-foreground font-medium">No Price</span>
           </div>
         </div>
       </CardContent>
