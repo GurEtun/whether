@@ -122,6 +122,7 @@ export function PriceChart({ marketId, title = "Price History" }: PriceChartProp
                   fontSize={11}
                   tickLine={false}
                   axisLine={false}
+                  tick={{ fill: "hsl(var(--foreground))" }}
                 />
                 <YAxis
                   domain={[yMin, yMax]}
@@ -131,6 +132,7 @@ export function PriceChart({ marketId, title = "Price History" }: PriceChartProp
                   tickLine={false}
                   axisLine={false}
                   width={45}
+                  tick={{ fill: "hsl(var(--foreground))" }}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <ReferenceLine y={50} stroke="hsl(var(--muted-foreground))" strokeDasharray="3 3" opacity={0.3} />
