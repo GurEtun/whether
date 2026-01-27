@@ -147,3 +147,44 @@
     transform: translateX(200%);
   }
 }
+
+/* Liquid glass shimmer effect for buttons */
+@keyframes liquid-shimmer {
+  0% {
+    left: -100%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.5;
+  }
+  20% {
+    opacity: 0;
+    left: 100%;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+@layer components {
+  [data-slot="button"]::before {
+    @apply absolute inset-0 rounded-md pointer-events-none opacity-0 transition-opacity duration-300;
+    content: "";
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
+    animation: none;
+  }
+
+  [data-slot="button"]:hover::before {
+    animation: liquid-shimmer 0.6s ease-in-out;
+  }
+
+  [data-slot="button"]:active {
+    @apply scale-95 transition-transform duration-100;
+  }
+}
