@@ -1,6 +1,9 @@
 "use client"
 
 import useSWR from "swr"
+import type { EventsListResponse, TransformedMarket } from "@/lib/kalshi-types"
+import { transformEventToMarket } from "@/lib/kalshi-types"
+import { useMemo } from "react"
 
 const JUP_API_BASE = "/api/jup"
 
@@ -45,7 +48,7 @@ interface JupiterMarketStats {
   lowPrice24h: number
 }
 
-const fetcher = async (url: string) => {
+const fetcher = async <T = unknown>(url: string): Promise<T> => {
   const res = await fetch(url)
   if (!res.ok) {
     const error = await res.json().catch(() => ({ error: "Failed to fetch" }))

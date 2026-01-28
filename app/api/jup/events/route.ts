@@ -1,54 +1,88 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { getCorsHeaders, errorResponse, handleOptions } from "@/lib/jup-client"
+import { getCorsHeaders, errorResponse, handleOptions, JUP_PREDICTION_URL } from "@/lib/jup-client"
+import type { EventsListResponse, EventCategory, EventFilter, EventSortBy, SortDirection } from "@/lib/kalshi-types"
 
 export async function OPTIONS() {
   return handleOptions()
 }
 
-// Generate realistic events data
-function generateEvents(limit: number = 20) {
-  const eventCategories = ["Crypto", "Politics", "Sports", "Economics", "Science & Tech", "Entertainment"]
-  const events = []
-
-  for (let i = 0; i < limit; i++) {
-    const now = Date.now()
-    const category = eventCategories[i % eventCategories.length]
-    
-    events.push({
-      id: `event-${i + 1}`,
-      title: `${category} Event ${i + 1}`,
-      description: `Major ${category.toLowerCase()} event with multiple prediction markets`,
-      category,
-      status: i % 3 === 0 ? "closed" : i % 2 === 0 ? "active" : "pending",
-      startDate: now - i * 86400000,
-      endDate: now + (30 - i) * 86400000,
-      marketCount: Math.floor(Math.random() * 10) + 3,
-      volume: Math.round(Math.random() * 500000 + 50000),
-    })
-  }
-
-  return events
-}
-
 export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams
-    const limit = parseInt(searchParams.get("limit") || "20", 10)
-    const category = searchParams.get("category")
-
-    let events = generateEvents(Math.min(limit, 100))
     
-    if (category) {
-      events = events.filter(e => e.category.toLowerCase() === category.toLowerCase())
+    // Build query params for Jupiter API
+    const params = new URLSearchParams()
+    
+    // Always use Kalshi provider
+    params.set("provider", "kalshi")
+    
+    // Include markets data
+    const includeMarkets = searchParams.get("includeMarkets")
+    if (includeMarkets !== "false") {
+      params.set("includeMarkets", "true")
+    }
+    
+    // Pagination
+    const start = searchParams.get("start")
+    const end = searchParams.get("end")
+    if (start) params.set("start", start)
+    if (end) params.set("end", end)
+    
+    // Category filter
+    const category = searchParams.get("category") as EventCategory | null
+    if (category && category !== "all") {
+      params.set("category", category.toLowerCase())
+    }
+    
+    // Subcategory
+    const subcategory = searchParams.get("subcategory")
+    if (subcategory) params.set("subcategory", subcategory)
+    
+    // Sorting
+    const sortBy = searchParams.get("sortBy") as EventSortBy | null
+    const sortDirection = searchParams.get("sortDirection") as SortDirection | null
+    if (sortBy) params.set("sortBy", sortBy)
+    if (sortDirection) params.set("sortDirection", sortDirection)
+    
+    // Filter (new, live, trending)
+    const filter = searchParams.get("filter") as EventFilter | null
+    if (filter) params.set("filter", filter)
+
+    const url = `${JUP_PREDICTION_URL}/api/v1/events?${params.toString()}`
+    
+    console.log("[jup-events] Fetching from:", url)
+    
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "User-Agent": "Whether-Prediction-Market/1.0",
+      },
+      next: { revalidate: 30 }, // Cache for 30 seconds
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error("[jup-events] API error:", response.status, errorText)
+      return errorResponse(
+        `Jupiter API error: ${response.statusText}`,
+        response.status,
+        { details: errorText }
+      )
     }
 
-    return NextResponse.json({ events }, {
+    const data: EventsListResponse = await response.json()
+    
+    console.log("[jup-events] Fetched", data.data?.length || 0, "events")
+
+    return NextResponse.json(data, {
       status: 200,
       headers: getCorsHeaders(),
     })
   } catch (error) {
     console.error("[jup-events] Error:", error)
     const message = error instanceof Error ? error.message : "Unknown error"
-    return errorResponse("Failed to fetch events", 500, { message })
+    return errorResponse("Failed to fetch events from Jupiter", 500, { message })
   }
 }

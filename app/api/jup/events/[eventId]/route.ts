@@ -1,28 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { getCorsHeaders, errorResponse, handleOptions } from "@/lib/jup-client"
+import { getCorsHeaders, errorResponse, handleOptions, JUP_PREDICTION_URL } from "@/lib/jup-client"
+import type { SingleEventResponse } from "@/lib/kalshi-types"
 
 export async function OPTIONS() {
   return handleOptions()
-}
-
-// Generate mock event detail
-function generateEventDetail(eventId: string) {
-  const eventCategories = ["Crypto", "Politics", "Sports", "Economics", "Science & Tech", "Entertainment"]
-  const now = Date.now()
-  const idx = parseInt(eventId.split("-")[1] || "0", 10) % eventCategories.length
-  
-  return {
-    id: eventId,
-    title: `${eventCategories[idx]} Event Details`,
-    description: `Major ${eventCategories[idx].toLowerCase()} event with comprehensive market coverage and real-time updates.`,
-    category: eventCategories[idx],
-    status: "active",
-    startDate: now - 86400000,
-    endDate: now + 30 * 86400000,
-    marketCount: 8,
-    volume: Math.round(Math.random() * 500000 + 50000),
-    traders: Math.floor(Math.random() * 5000 + 100),
-  }
 }
 
 export async function GET(
@@ -31,9 +12,47 @@ export async function GET(
 ) {
   try {
     const { eventId } = await params
-    const event = generateEventDetail(eventId)
+    const searchParams = req.nextUrl.searchParams
+    
+    // Build query params
+    const queryParams = new URLSearchParams()
+    const includeMarkets = searchParams.get("includeMarkets")
+    if (includeMarkets !== "false") {
+      queryParams.set("includeMarkets", "true")
+    }
 
-    return NextResponse.json(event, {
+    const url = `${JUP_PREDICTION_URL}/api/v1/events/${encodeURIComponent(eventId)}?${queryParams.toString()}`
+    
+    console.log("[jup-event-detail] Fetching:", url)
+    
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "User-Agent": "Whether-Prediction-Market/1.0",
+      },
+      next: { revalidate: 30 }, // Cache for 30 seconds
+    })
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return errorResponse("Event not found", 404, { eventId })
+      }
+      const errorText = await response.text()
+      console.error("[jup-event-detail] API error:", response.status, errorText)
+      return errorResponse(
+        `Jupiter API error: ${response.statusText}`,
+        response.status,
+        { details: errorText }
+      )
+    }
+
+    const data: SingleEventResponse = await response.json()
+    
+    console.log("[jup-event-detail] Fetched event:", data.eventId, "with", data.markets?.length || 0, "markets")
+
+    return NextResponse.json(data, {
       status: 200,
       headers: getCorsHeaders(),
     })

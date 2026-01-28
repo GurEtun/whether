@@ -1,54 +1,56 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { getCorsHeaders, errorResponse, handleOptions } from "@/lib/jup-client"
+import { getCorsHeaders, errorResponse, handleOptions, JUP_PREDICTION_URL } from "@/lib/jup-client"
+import type { EventsSearchResponse } from "@/lib/kalshi-types"
 
 export async function OPTIONS() {
   return handleOptions()
-}
-
-// Generate realistic events data
-function generateEvents(limit: number = 20) {
-  const eventCategories = ["Crypto", "Politics", "Sports", "Economics", "Science & Tech", "Entertainment"]
-  const events = []
-
-  for (let i = 0; i < limit; i++) {
-    const now = Date.now()
-    const category = eventCategories[i % eventCategories.length]
-    
-    events.push({
-      id: `event-${i + 1}`,
-      title: `${category} Event ${i + 1}`,
-      description: `Major ${category.toLowerCase()} event with multiple prediction markets`,
-      category,
-      status: i % 3 === 0 ? "closed" : i % 2 === 0 ? "active" : "pending",
-      startDate: now - i * 86400000,
-      endDate: now + (30 - i) * 86400000,
-      marketCount: Math.floor(Math.random() * 10) + 3,
-      volume: Math.round(Math.random() * 500000 + 50000),
-    })
-  }
-
-  return events
 }
 
 export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams
     const query = searchParams.get("query")
-    const limit = parseInt(searchParams.get("limit") || "20", 10)
+    const limit = searchParams.get("limit") || "20"
     
     if (!query) {
       return errorResponse("Missing required query parameter: query", 400)
     }
 
-    let events = generateEvents(Math.min(limit, 100))
-    
-    // Filter by search query
-    events = events.filter(e => 
-      e.title.toLowerCase().includes(query.toLowerCase()) ||
-      e.description.toLowerCase().includes(query.toLowerCase())
-    )
+    // Build query params for Jupiter API
+    const params = new URLSearchParams()
+    params.set("provider", "kalshi")
+    params.set("query", query)
+    params.set("limit", Math.min(parseInt(limit, 10), 20).toString())
 
-    return NextResponse.json({ events }, {
+    const url = `${JUP_PREDICTION_URL}/api/v1/events/search?${params.toString()}`
+    
+    console.log("[jup-events-search] Searching:", url)
+    
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "User-Agent": "Whether-Prediction-Market/1.0",
+      },
+      next: { revalidate: 10 }, // Cache search results for 10 seconds
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error("[jup-events-search] API error:", response.status, errorText)
+      return errorResponse(
+        `Jupiter API error: ${response.statusText}`,
+        response.status,
+        { details: errorText }
+      )
+    }
+
+    const data: EventsSearchResponse = await response.json()
+    
+    console.log("[jup-events-search] Found", data.data?.length || 0, "events for query:", query)
+
+    return NextResponse.json(data, {
       status: 200,
       headers: getCorsHeaders(),
     })
