@@ -44,20 +44,7 @@ export function HeroSection() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-3 gap-4 pt-6 sm:gap-8 sm:pt-8">
-              <div>
-                <p className="text-xl font-bold text-foreground sm:text-2xl lg:text-3xl">$2.4B+</p>
-                <p className="text-xs sm:text-sm text-muted-foreground">Trading Volume</p>
-              </div>
-              <div>
-                <p className="text-xl font-bold text-foreground sm:text-2xl lg:text-3xl">150K+</p>
-                <p className="text-xs sm:text-sm text-muted-foreground">Active Traders</p>
-              </div>
-              <div>
-                <p className="text-xl font-bold text-foreground sm:text-2xl lg:text-3xl">500+</p>
-                <p className="text-xs sm:text-sm text-muted-foreground">Live Markets</p>
-              </div>
-            </div>
+            
           </div>
 
           <div className="relative">
