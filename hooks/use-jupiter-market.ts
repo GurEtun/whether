@@ -149,25 +149,79 @@ export function useJupiterMarketStats(marketId: string | null) {
 }
 
 /**
- * Fetch all events/markets
+ * Fetch all events/markets from Jupiter Kalshi API
  */
-export function useJupiterEvents(category?: string) {
+export function useJupiterEvents(options?: {
+  category?: string
+  filter?: "new" | "live" | "trending"
+  sortBy?: "volume" | "beginAt"
+  sortDirection?: "asc" | "desc"
+}) {
   const params = new URLSearchParams()
-  if (category) params.set("category", category)
+  params.set("provider", "kalshi")
+  params.set("includeMarkets", "true")
   
-  const { data, error, isLoading, mutate } = useSWR(
-    `${JUP_API_BASE}/events${params.toString() ? `?${params}` : ""}`,
+  if (options?.category && options.category !== "all") {
+    params.set("category", options.category.toLowerCase())
+  }
+  if (options?.filter) params.set("filter", options.filter)
+  if (options?.sortBy) params.set("sortBy", options.sortBy)
+  if (options?.sortDirection) params.set("sortDirection", options.sortDirection)
+  
+  const { data, error, isLoading, mutate } = useSWR<EventsListResponse>(
+    `${JUP_API_BASE}/events?${params.toString()}`,
     fetcher,
     {
-      refreshInterval: 30000,
+      refreshInterval: 15000, // Refresh every 15 seconds for live data
       revalidateOnFocus: true,
+      dedupingInterval: 5000,
     }
   )
 
+  // Transform events to market format for compatibility
+  const markets: TransformedMarket[] = useMemo(() => {
+    if (!data?.data) return []
+    return data.data.map(transformEventToMarket)
+  }, [data])
+
   return {
-    events: data?.events || [],
+    events: data?.data || [],
+    markets,
     isLoading,
     isError: error,
     refresh: mutate,
+    pagination: data?.pagination,
+  }
+}
+
+/**
+ * Search events by query
+ */
+export function useJupiterEventSearch(query: string | null) {
+  const params = new URLSearchParams()
+  if (query) {
+    params.set("query", query)
+    params.set("limit", "20")
+  }
+  
+  const { data, error, isLoading } = useSWR(
+    query ? `${JUP_API_BASE}/events/search?${params.toString()}` : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 1000,
+    }
+  )
+
+  const markets: TransformedMarket[] = useMemo(() => {
+    if (!data?.data) return []
+    return data.data.map(transformEventToMarket)
+  }, [data])
+
+  return {
+    events: data?.data || [],
+    markets,
+    isLoading,
+    isError: error,
   }
 }
