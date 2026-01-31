@@ -181,27 +181,36 @@ export function transformEventToMarket(event: KalshiEvent, marketIndex = 0): Tra
   const market = event.markets?.[marketIndex] || event.markets?.[0]
   const pricing = market?.pricing
   
-  // Extract pricing - API returns values in dollars (0.00 to 1.00 scale representing probability)
-  // buyYesPriceUsd and buyNoPriceUsd can be null, so we need safe defaults
-  let yesPrice = pricing?.buyYesPriceUsd
-  let noPrice = pricing?.buyNoPriceUsd
+  // Extract pricing - API returns values in MICRO-DOLLARS (e.g., 330000 = $0.33 = 33 cents)
+  // We need to divide by 1,000,000 to convert to dollars, then multiply by 100 to get cents
+  // Or simply divide by 10,000 to go directly from micro-dollars to cents
+  let rawYesPrice = pricing?.buyYesPriceUsd
+  let rawNoPrice = pricing?.buyNoPriceUsd
   
-  // If both are null, try to use sellYes/sellNo prices or default to 50/50
-  if (yesPrice === null || yesPrice === undefined) {
-    yesPrice = pricing?.sellYesPriceUsd ?? 0.5
+  // If buy prices are null, try sell prices
+  if (rawYesPrice === null || rawYesPrice === undefined) {
+    rawYesPrice = pricing?.sellYesPriceUsd
   }
-  if (noPrice === null || noPrice === undefined) {
-    noPrice = pricing?.sellNoPriceUsd ?? (1 - yesPrice)
+  if (rawNoPrice === null || rawNoPrice === undefined) {
+    rawNoPrice = pricing?.sellNoPriceUsd
   }
   
-  // Ensure values are numbers and clamp to valid range
-  const yesPriceNum = typeof yesPrice === 'number' ? yesPrice : 0.5
-  const noPriceNum = typeof noPrice === 'number' ? noPrice : 0.5
+  // Convert from micro-dollars to cents (percentage)
+  // API: 330000 micro-dollars = $0.33 = 33 cents = 33%
+  // Formula: micro-dollars / 10000 = cents
+  let yesPriceCents = 50 // Default to 50%
+  let noPriceCents = 50
   
-  // Convert to cents (0-100 scale for display)
-  // The API returns probability as decimal (0.65 = 65% = 65 cents)
-  const yesPriceCents = Math.round(Math.max(0, Math.min(1, yesPriceNum)) * 100)
-  const noPriceCents = Math.round(Math.max(0, Math.min(1, noPriceNum)) * 100)
+  if (rawYesPrice !== null && rawYesPrice !== undefined && typeof rawYesPrice === 'number') {
+    yesPriceCents = Math.round(rawYesPrice / 10000)
+  }
+  if (rawNoPrice !== null && rawNoPrice !== undefined && typeof rawNoPrice === 'number') {
+    noPriceCents = Math.round(rawNoPrice / 10000)
+  }
+  
+  // Ensure values are in valid range (0-100)
+  yesPriceCents = Math.max(0, Math.min(100, yesPriceCents))
+  noPriceCents = Math.max(0, Math.min(100, noPriceCents))
   
   // Get volume data
   const volume24h = pricing?.volume24h || pricing?.volume || 0
