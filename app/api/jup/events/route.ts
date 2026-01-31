@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
 
     const url = `${JUP_PREDICTION_URL}/api/v1/events?${params.toString()}`
     
-    console.log("[jup-events] Fetching from:", url)
+    console.log("[v0] [jup-events] Fetching from:", url)
     
     const response = await fetch(url, {
       method: "GET",
@@ -59,8 +59,10 @@ export async function GET(req: NextRequest) {
         "Accept": "application/json",
         "User-Agent": "Whether-Prediction-Market/1.0",
       },
-      next: { revalidate: 30 }, // Cache for 30 seconds
+      cache: "no-store", // Disable cache for debugging
     })
+    
+    console.log("[v0] [jup-events] Response status:", response.status, response.statusText)
 
     if (!response.ok) {
       const errorText = await response.text()
@@ -74,7 +76,25 @@ export async function GET(req: NextRequest) {
 
     const data: EventsListResponse = await response.json()
     
-    console.log("[jup-events] Fetched", data.data?.length || 0, "events")
+    console.log("[v0] [jup-events] Fetched", data.data?.length || 0, "events")
+    
+    // Log first event's pricing for debugging
+    if (data.data?.[0]) {
+      const firstEvent = data.data[0]
+      const firstMarket = firstEvent.markets?.[0]
+      console.log("[v0] [jup-events] First event:", {
+        eventId: firstEvent.eventId,
+        title: firstEvent.metadata?.title,
+        category: firstEvent.category,
+        isLive: firstEvent.isLive,
+        marketsCount: firstEvent.markets?.length || 0,
+        firstMarketPricing: firstMarket?.pricing ? {
+          buyYesPriceUsd: firstMarket.pricing.buyYesPriceUsd,
+          buyNoPriceUsd: firstMarket.pricing.buyNoPriceUsd,
+          volume24h: firstMarket.pricing.volume24h,
+        } : 'no pricing data'
+      })
+    }
 
     return NextResponse.json(data, {
       status: 200,

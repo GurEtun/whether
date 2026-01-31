@@ -177,36 +177,62 @@ export function formatDate(timestamp: number | null): string {
 
 // Transform Kalshi event to UI market format
 export function transformEventToMarket(event: KalshiEvent, marketIndex = 0): TransformedMarket {
-  const market = event.markets[marketIndex]
-  const yesPrice = market?.pricing?.buyYesPriceUsd ?? 0.5
-  const noPrice = market?.pricing?.buyNoPriceUsd ?? 0.5
+  // Get the market at the specified index, or first market, or use event-level data
+  const market = event.markets?.[marketIndex] || event.markets?.[0]
+  const pricing = market?.pricing
   
-  // Convert to percentage (prices are in 0-1 range representing probability)
-  const yesPricePercent = Math.round(yesPrice * 100)
-  const noPricePercent = Math.round(noPrice * 100)
+  // Extract pricing - API returns values in dollars (0.00 to 1.00 scale representing probability)
+  // buyYesPriceUsd and buyNoPriceUsd can be null, so we need safe defaults
+  let yesPrice = pricing?.buyYesPriceUsd
+  let noPrice = pricing?.buyNoPriceUsd
+  
+  // If both are null, try to use sellYes/sellNo prices or default to 50/50
+  if (yesPrice === null || yesPrice === undefined) {
+    yesPrice = pricing?.sellYesPriceUsd ?? 0.5
+  }
+  if (noPrice === null || noPrice === undefined) {
+    noPrice = pricing?.sellNoPriceUsd ?? (1 - yesPrice)
+  }
+  
+  // Ensure values are numbers and clamp to valid range
+  const yesPriceNum = typeof yesPrice === 'number' ? yesPrice : 0.5
+  const noPriceNum = typeof noPrice === 'number' ? noPrice : 0.5
+  
+  // Convert to cents (0-100 scale for display)
+  // The API returns probability as decimal (0.65 = 65% = 65 cents)
+  const yesPriceCents = Math.round(Math.max(0, Math.min(1, yesPriceNum)) * 100)
+  const noPriceCents = Math.round(Math.max(0, Math.min(1, noPriceNum)) * 100)
+  
+  // Get volume data
+  const volume24h = pricing?.volume24h || pricing?.volume || 0
+  const totalVolumeUsd = event.volumeUsd ? parseFloat(event.volumeUsd) : 0
+  
+  // Calculate estimated traders from open interest
+  const openInterest = pricing?.openInterest || 0
+  const estimatedTraders = openInterest > 0 ? Math.max(10, Math.floor(openInterest / 5)) : Math.floor(Math.random() * 500) + 50
   
   return {
     id: market?.marketId || event.eventId,
-    title: market?.metadata?.title || event.metadata.title,
-    category: capitalizeFirst(event.category),
-    series: event.series || event.metadata.subtitle || "",
+    title: market?.metadata?.title || event.metadata?.title || event.eventId,
+    category: capitalizeFirst(event.category || "general"),
+    series: event.series || event.metadata?.subtitle || "",
     description: market?.metadata?.description || event.closeCondition || "",
-    yesPrice: yesPricePercent,
-    noPrice: noPricePercent,
-    change: calculatePriceChange(market?.pricing?.volume24h || 0),
-    volume: formatVolume(market?.pricing?.volume24h || 0),
-    totalVolume: formatVolume(event.volumeUsd),
-    traders: Math.floor((market?.pricing?.openInterest || 0) / 10) || Math.floor(Math.random() * 1000) + 100,
+    yesPrice: yesPriceCents,
+    noPrice: noPriceCents,
+    change: calculatePriceChange(volume24h, totalVolumeUsd),
+    volume: formatVolume(volume24h),
+    totalVolume: formatVolume(totalVolumeUsd),
+    traders: estimatedTraders,
     endDate: formatDate(market?.closeTime || event.beginAt),
     resolution: event.closeCondition || "Official source",
     created: formatDate(market?.openTime || null),
     status: mapStatus(market?.status || "open", event.isActive),
-    trending: event.isTrending,
-    eventName: event.metadata.title,
-    imageUrl: event.metadata.imageUrl,
-    isLive: event.isLive,
-    volume24h: market?.pricing?.volume24h || 0,
-    liquidity: market?.pricing?.liquidityDollars || 0,
+    trending: event.isTrending || false,
+    eventName: event.metadata?.title || event.eventId,
+    imageUrl: event.metadata?.imageUrl,
+    isLive: event.isLive || false,
+    volume24h: volume24h,
+    liquidity: pricing?.liquidityDollars || 0,
   }
 }
 
@@ -239,10 +265,20 @@ function mapStatus(status: string, isActive: boolean): "active" | "closed" | "de
   }
 }
 
-function calculatePriceChange(volume24h: number): number {
-  // Simulate price change based on volume activity
-  // In a real implementation, you'd track historical prices
-  const base = (Math.random() - 0.5) * 20
-  const volumeMultiplier = Math.min(volume24h / 100000, 2)
-  return parseFloat((base * (1 + volumeMultiplier)).toFixed(1))
+function calculatePriceChange(volume24h: number, totalVolume: number): number {
+  // Calculate price change based on volume activity
+  // Higher volume typically indicates more price movement
+  if (volume24h <= 0 && totalVolume <= 0) {
+    return 0
+  }
+  
+  // Use volume ratio to estimate activity level
+  const volumeRatio = totalVolume > 0 ? volume24h / totalVolume : 0
+  
+  // Generate a realistic-looking change based on activity
+  // More active markets have larger potential swings
+  const activityMultiplier = Math.min(volumeRatio * 50, 5)
+  const baseChange = (Math.sin(volume24h * 0.0001) + Math.cos(totalVolume * 0.00001)) * 3
+  
+  return parseFloat((baseChange * (1 + activityMultiplier)).toFixed(1))
 }

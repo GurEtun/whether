@@ -49,12 +49,24 @@ interface JupiterMarketStats {
 }
 
 const fetcher = async <T = unknown>(url: string): Promise<T> => {
-  const res = await fetch(url)
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({ error: "Failed to fetch" }))
-    throw new Error(error.error || "Failed to fetch")
+  console.log("[v0] Fetching:", url)
+  
+  try {
+    const res = await fetch(url)
+    
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({ error: res.statusText }))
+      console.error("[v0] Fetch error:", res.status, errorData)
+      throw new Error(errorData.error || `HTTP ${res.status}: ${res.statusText}`)
+    }
+    
+    const data = await res.json()
+    console.log("[v0] Fetch success, data keys:", Object.keys(data))
+    return data
+  } catch (error) {
+    console.error("[v0] Fetch exception:", error)
+    throw error
   }
-  return res.json()
 }
 
 /**
