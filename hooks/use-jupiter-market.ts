@@ -183,6 +183,7 @@ export function useJupiterEvents(options?: {
   // Transform events to market format for compatibility
   const markets: TransformedMarket[] = useMemo(() => {
     if (!data?.data) return []
+    console.log("[v0] Events count:", data.data.length, "Pagination:", data.pagination)
     return data.data.map(transformEventToMarket)
   }, [data])
 
