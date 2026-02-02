@@ -90,7 +90,7 @@ export function HeroSection() {
               </div>
 
               {/* Dynamic Content Based on Step */}
-              <div className="relative min-h-[140px] sm:min-h-[160px]">
+              <div className="relative min-h-[160px] sm:min-h-[180px] overflow-hidden">
                 {/* Step 0: Browse Markets */}
                 <div
                   className={`absolute inset-0 transition-all duration-500 ${
@@ -142,55 +142,55 @@ export function HeroSection() {
 
                 {/* Step 2: Track Position - 3D Cards */}
                 <div
-                  className={`absolute inset-0 transition-all duration-500 ${
+                  className={`absolute inset-0 transition-all duration-500 overflow-hidden ${
                     activeStep === 2 ? "opacity-100 translate-x-0" : activeStep < 2 ? "opacity-0 translate-x-8 pointer-events-none" : "opacity-0 -translate-x-8 pointer-events-none"
                   }`}
                 >
-                  <div className="p-3 sm:p-4 rounded-xl bg-secondary/50 border border-border overflow-hidden space-y-3">
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                      <span className="text-xs sm:text-sm font-medium text-foreground">Your Position</span>
-                      <span className="text-xs sm:text-sm text-success font-medium">+$12.50 (25%)</span>
+                  <div className="p-2 sm:p-3 rounded-xl bg-secondary/50 border border-border space-y-2">
+                    <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
+                      <span className="text-xs sm:text-sm font-medium text-foreground">Position</span>
+                      <span className="text-xs text-success font-medium">+$12.50 (25%)</span>
                     </div>
                     
                     {/* 3D Position Cards */}
-                    <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+                    <div className="grid grid-cols-3 gap-1">
                       {/* Card 1: Shares */}
-                      <div className="relative group perspective">
-                        <div className="relative p-2.5 sm:p-3 rounded-lg border border-border bg-gradient-to-br from-card to-secondary/50 transition-all duration-300 group-hover:border-primary/50 group-hover:shadow-lg group-hover:shadow-primary/20" style={{ transform: "rotateX(5deg) rotateY(-5deg)" }}>
-                          <p className="text-xs text-muted-foreground mb-1">Shares</p>
-                          <p className="text-sm sm:text-base font-bold text-foreground">75</p>
-                          <p className="text-xs text-muted-foreground mt-1">YES</p>
+                      <div className="relative group">
+                        <div className="p-2 rounded-lg border border-border bg-gradient-to-br from-card to-secondary/50 transition-all duration-300 group-hover:border-primary/50" style={{ transform: "rotateX(5deg) rotateY(-5deg)" }}>
+                          <p className="text-xs text-muted-foreground mb-0.5">Shares</p>
+                          <p className="text-sm font-bold text-foreground">75</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">YES</p>
                         </div>
                       </div>
                       
                       {/* Card 2: Avg Price */}
-                      <div className="relative group perspective">
-                        <div className="relative p-2.5 sm:p-3 rounded-lg border border-border bg-gradient-to-br from-card to-secondary/50 transition-all duration-300 group-hover:border-primary/50 group-hover:shadow-lg group-hover:shadow-primary/20" style={{ transform: "rotateX(5deg) rotateY(0deg)" }}>
-                          <p className="text-xs text-muted-foreground mb-1">Avg. Price</p>
-                          <p className="text-sm sm:text-base font-bold text-primary">{MARKETS_DATA[activeMarket].yes}¢</p>
-                          <p className="text-xs text-muted-foreground mt-1">entry</p>
+                      <div className="relative group">
+                        <div className="p-2 rounded-lg border border-border bg-gradient-to-br from-card to-secondary/50 transition-all duration-300 group-hover:border-primary/50" style={{ transform: "rotateX(5deg) rotateY(0deg)" }}>
+                          <p className="text-xs text-muted-foreground mb-0.5">Avg. Price</p>
+                          <p className="text-sm font-bold text-primary">{MARKETS_DATA[activeMarket].yes}¢</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">entry</p>
                         </div>
                       </div>
                       
                       {/* Card 3: Value */}
-                      <div className="relative group perspective">
-                        <div className="relative p-2.5 sm:p-3 rounded-lg border border-border bg-gradient-to-br from-card to-secondary/50 transition-all duration-300 group-hover:border-success/50 group-hover:shadow-lg group-hover:shadow-success/20" style={{ transform: "rotateX(5deg) rotateY(5deg)" }}>
-                          <p className="text-xs text-muted-foreground mb-1">Value</p>
-                          <p className="text-sm sm:text-base font-bold text-success">$62.50</p>
-                          <p className="text-xs text-success mt-1">+25%</p>
+                      <div className="relative group">
+                        <div className="p-2 rounded-lg border border-border bg-gradient-to-br from-card to-secondary/50 transition-all duration-300 group-hover:border-success/50" style={{ transform: "rotateX(5deg) rotateY(5deg)" }}>
+                          <p className="text-xs text-muted-foreground mb-0.5">Value</p>
+                          <p className="text-sm font-bold text-success">$62.50</p>
+                          <p className="text-xs text-success mt-0.5">+25%</p>
                         </div>
                       </div>
                     </div>
                     
                     {/* Mini chart line */}
-                    <div className="mt-4 p-2 sm:p-3 rounded-lg border border-border/50 bg-card/30 backdrop-blur">
-                      <p className="text-xs text-muted-foreground mb-2">Price Movement</p>
-                      <div className="h-6 sm:h-8 flex items-end gap-0.5">
+                    <div className="p-1.5 rounded-lg border border-border/50 bg-card/30">
+                      <p className="text-xs text-muted-foreground mb-1">Price Movement</p>
+                      <div className="h-4 flex items-end gap-0.5">
                         {[40, 55, 48, 62, 58, 70, 65, 78, 72, 85].map((h, i) => (
                           <div
                             key={i}
                             className="flex-1 bg-gradient-to-t from-primary to-primary/50 rounded-t transition-all duration-300"
-                            style={{ height: `${h}%`, transitionDelay: `${i * 50}ms`, boxShadow: `0 0 6px rgba(var(--primary), 0.3)` }}
+                            style={{ height: `${h}%`, transitionDelay: `${i * 50}ms` }}
                           />
                         ))}
                       </div>
@@ -204,14 +204,14 @@ export function HeroSection() {
                     activeStep === 3 ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
                   }`}
                 >
-                  <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-success/20 to-success/5 border border-success/30 text-center">
-                    <div className="inline-flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-success mb-2 sm:mb-3">
-                      <Check className="h-6 w-6 sm:h-8 sm:w-8 text-success-foreground" />
+                  <div className="p-2 sm:p-3 rounded-xl bg-gradient-to-br from-success/20 to-success/5 border border-success/30 text-center">
+                    <div className="inline-flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-success mb-1.5">
+                      <Check className="h-5 w-5 sm:h-6 sm:w-6 text-success-foreground" />
                     </div>
-                    <h4 className="text-base sm:text-lg font-bold text-foreground mb-1">Trade Done!</h4>
-                    <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-3">Position active</p>
-                    <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-success/20 text-success text-xs sm:text-sm font-medium">
-                      <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                    <h4 className="text-sm sm:text-base font-bold text-foreground mb-0.5">Trade Done!</h4>
+                    <p className="text-xs text-muted-foreground mb-1.5">Position active</p>
+                    <div className="inline-flex items-center gap-1 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full bg-success/20 text-success text-xs font-medium">
+                      <Sparkles className="h-3 w-3 flex-shrink-0" />
                       <span className="truncate">+$37.50</span>
                     </div>
                   </div>
