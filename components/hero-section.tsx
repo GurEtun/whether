@@ -69,52 +69,24 @@ export function HeroSection() {
                 <div className="absolute inset-0 bg-gradient-to-br from-success/10 via-transparent to-success/5" />
               </div>
 
-              {/* Flow Steps Timeline */}
-              <div className="relative mb-6">
-                <div className="flex items-center justify-between">
-                  {FLOW_STEPS.map((step, idx) => (
-                    <div key={step.label} className="flex flex-col items-center relative z-10">
-                      {/* Step Circle */}
-                      <div
-                        className={`relative flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full border-2 transition-all duration-500 ${
-                          idx < activeStep
-                            ? "border-success bg-success text-success-foreground scale-100"
-                            : idx === activeStep
-                              ? "border-primary bg-primary text-primary-foreground scale-110 shadow-lg shadow-primary/30"
-                              : "border-muted bg-muted/50 text-muted-foreground scale-90"
-                        }`}
-                      >
-                        {idx < activeStep ? (
-                          <Check className="h-5 w-5 sm:h-6 sm:w-6" />
-                        ) : idx === activeStep ? (
-                          <div className="relative">
-                            <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 animate-pulse" />
-                            {/* Ripple effect */}
-                            <span className="absolute inset-0 animate-ping rounded-full bg-primary/30" />
-                          </div>
-                        ) : (
-                          <span className="text-sm font-bold">{idx + 1}</span>
-                        )}
-                      </div>
-                      {/* Step Label */}
-                      <span
-                        className={`mt-2 text-xs font-medium transition-colors duration-300 text-center ${
-                          idx <= activeStep ? "text-foreground" : "text-muted-foreground"
-                        }`}
-                      >
-                        <span className="hidden sm:inline">{step.label}</span>
-                        <span className="sm:hidden">{step.label.split(" ")[0]}</span>
-                      </span>
-                    </div>
-                  ))}
-                </div>
-                {/* Progress Line */}
-                <div className="absolute top-5 sm:top-6 left-6 right-6 sm:left-8 sm:right-8 h-0.5 bg-muted -z-0">
-                  <div
-                    className="h-full bg-gradient-to-r from-success via-primary to-primary transition-all duration-700 ease-out"
-                    style={{ width: `${(activeStep / (FLOW_STEPS.length - 1)) * 100}%` }}
-                  />
-                </div>
+              {/* Flow Steps Timeline - Abstract Gray Dots */}
+              <div className="relative mb-6 flex items-center justify-center gap-2">
+                {FLOW_STEPS.map((step, idx) => (
+                  <div key={step.label} className="flex flex-col items-center gap-2">
+                    {/* Abstract dot indicator */}
+                    <div
+                      className={`transition-all duration-500 ${
+                        idx <= activeStep
+                          ? "h-2 w-2 bg-muted-foreground/80"
+                          : "h-1.5 w-1.5 bg-muted-foreground/30"
+                      } rounded-full`}
+                    />
+                    {/* Subtle connector line */}
+                    {idx < FLOW_STEPS.length - 1 && (
+                      <div className="absolute left-1/2 top-1 w-8 h-px bg-gradient-to-r from-muted-foreground/30 to-transparent" />
+                    )}
+                  </div>
+                ))}
               </div>
 
               {/* Dynamic Content Based on Step */}
