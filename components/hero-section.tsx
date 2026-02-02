@@ -83,18 +83,7 @@ export function HeroSection() {
                     />
                     {/* Subtle connector line */}
                     {idx < FLOW_STEPS.length - 1 && (
-                      <div className="absolute left-1/2 top-1 w-8 h-px bg-gradient-to-r from-muted-foreground/30 to-transparent" />
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {/* Dynamic Content Based on Step */}
-              <div className="relative min-h-[140px] sm:min-h-[160px]">
-                {/* Step 0: Browse Markets */}
-                <div
-                  className={`absolute inset-0 transition-all duration-500 ${
-                    activeStep === 0 ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8 pointer-events-none"
+                      ty-0 -translate-x-8 pointer-events-none"
                   }`}
                 >
                   <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50 border border-border">
