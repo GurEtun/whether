@@ -174,27 +174,27 @@ export function HeroSection() {
                     activeStep === 2 ? "opacity-100 translate-x-0" : activeStep < 2 ? "opacity-0 translate-x-8 pointer-events-none" : "opacity-0 -translate-x-8 pointer-events-none"
                   }`}
                 >
-                  <div className="p-3 rounded-xl bg-secondary/50 border border-border">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-sm font-medium text-foreground">Your Position</span>
-                      <span className="text-xs text-success font-medium">+$12.50 (25%)</span>
+                  <div className="p-3 sm:p-4 rounded-xl bg-secondary/50 border border-border overflow-hidden">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-3">
+                      <span className="text-xs sm:text-sm font-medium text-foreground">Your Position</span>
+                      <span className="text-xs sm:text-sm text-success font-medium">+$12.50 (25%)</span>
                     </div>
                     <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Shares</span>
-                        <span className="text-foreground font-medium">75 YES</span>
+                      <div className="flex justify-between text-xs sm:text-sm gap-2">
+                        <span className="text-muted-foreground truncate">Shares</span>
+                        <span className="text-foreground font-medium whitespace-nowrap">75 YES</span>
                       </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Avg. Price</span>
-                        <span className="text-foreground font-medium">{MARKETS_DATA[activeMarket].yes}¢</span>
+                      <div className="flex justify-between text-xs sm:text-sm gap-2">
+                        <span className="text-muted-foreground truncate">Avg. Price</span>
+                        <span className="text-foreground font-medium whitespace-nowrap">{MARKETS_DATA[activeMarket].yes}¢</span>
                       </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Current Value</span>
-                        <span className="text-success font-medium">$62.50</span>
+                      <div className="flex justify-between text-xs sm:text-sm gap-2">
+                        <span className="text-muted-foreground truncate">Value</span>
+                        <span className="text-success font-medium whitespace-nowrap">$62.50</span>
                       </div>
                     </div>
                     {/* Mini chart line */}
-                    <div className="mt-3 h-8 flex items-end gap-0.5">
+                    <div className="mt-3 h-6 sm:h-8 flex items-end gap-0.5">
                       {[40, 55, 48, 62, 58, 70, 65, 78, 72, 85].map((h, i) => (
                         <div
                           key={i}
@@ -212,15 +212,15 @@ export function HeroSection() {
                     activeStep === 3 ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
                   }`}
                 >
-                  <div className="p-4 rounded-xl bg-gradient-to-br from-success/20 to-success/5 border border-success/30 text-center">
-                    <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-success mb-3">
-                      <Check className="h-8 w-8 text-success-foreground" />
+                  <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-br from-success/20 to-success/5 border border-success/30 text-center">
+                    <div className="inline-flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-success mb-2 sm:mb-3">
+                      <Check className="h-6 w-6 sm:h-8 sm:w-8 text-success-foreground" />
                     </div>
-                    <h4 className="text-lg font-bold text-foreground mb-1">Trade Successful!</h4>
-                    <p className="text-sm text-muted-foreground mb-3">Your position is now active</p>
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-success/20 text-success text-sm font-medium">
-                      <Sparkles className="h-4 w-4" />
-                      +$37.50 Potential Profit
+                    <h4 className="text-base sm:text-lg font-bold text-foreground mb-1">Trade Done!</h4>
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-3">Position active</p>
+                    <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-success/20 text-success text-xs sm:text-sm font-medium">
+                      <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                      <span className="truncate">+$37.50</span>
                     </div>
                   </div>
                 </div>
