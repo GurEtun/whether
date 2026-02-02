@@ -83,7 +83,18 @@ export function HeroSection() {
                     />
                     {/* Subtle connector line */}
                     {idx < FLOW_STEPS.length - 1 && (
-                      ty-0 -translate-x-8 pointer-events-none"
+                      <div className="absolute left-1/2 top-1 w-8 h-px bg-gradient-to-r from-muted-foreground/30 to-transparent" />
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Dynamic Content Based on Step */}
+              <div className="relative min-h-[140px] sm:min-h-[160px]">
+                {/* Step 0: Browse Markets */}
+                <div
+                  className={`absolute inset-0 transition-all duration-500 ${
+                    activeStep === 0 ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8 pointer-events-none"
                   }`}
                 >
                   <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50 border border-border">
@@ -129,40 +140,60 @@ export function HeroSection() {
                   </div>
                 </div>
 
-                {/* Step 2: Track Position */}
+                {/* Step 2: Track Position - 3D Cards */}
                 <div
                   className={`absolute inset-0 transition-all duration-500 ${
                     activeStep === 2 ? "opacity-100 translate-x-0" : activeStep < 2 ? "opacity-0 translate-x-8 pointer-events-none" : "opacity-0 -translate-x-8 pointer-events-none"
                   }`}
                 >
-                  <div className="p-3 sm:p-4 rounded-xl bg-secondary/50 border border-border overflow-hidden">
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-3">
+                  <div className="p-3 sm:p-4 rounded-xl bg-secondary/50 border border-border overflow-hidden space-y-3">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <span className="text-xs sm:text-sm font-medium text-foreground">Your Position</span>
                       <span className="text-xs sm:text-sm text-success font-medium">+$12.50 (25%)</span>
                     </div>
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-xs sm:text-sm gap-2">
-                        <span className="text-muted-foreground truncate">Shares</span>
-                        <span className="text-foreground font-medium whitespace-nowrap">75 YES</span>
+                    
+                    {/* 3D Position Cards */}
+                    <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+                      {/* Card 1: Shares */}
+                      <div className="relative group perspective">
+                        <div className="relative p-2.5 sm:p-3 rounded-lg border border-border bg-gradient-to-br from-card to-secondary/50 transition-all duration-300 group-hover:border-primary/50 group-hover:shadow-lg group-hover:shadow-primary/20" style={{ transform: "rotateX(5deg) rotateY(-5deg)" }}>
+                          <p className="text-xs text-muted-foreground mb-1">Shares</p>
+                          <p className="text-sm sm:text-base font-bold text-foreground">75</p>
+                          <p className="text-xs text-muted-foreground mt-1">YES</p>
+                        </div>
                       </div>
-                      <div className="flex justify-between text-xs sm:text-sm gap-2">
-                        <span className="text-muted-foreground truncate">Avg. Price</span>
-                        <span className="text-foreground font-medium whitespace-nowrap">{MARKETS_DATA[activeMarket].yes}¢</span>
+                      
+                      {/* Card 2: Avg Price */}
+                      <div className="relative group perspective">
+                        <div className="relative p-2.5 sm:p-3 rounded-lg border border-border bg-gradient-to-br from-card to-secondary/50 transition-all duration-300 group-hover:border-primary/50 group-hover:shadow-lg group-hover:shadow-primary/20" style={{ transform: "rotateX(5deg) rotateY(0deg)" }}>
+                          <p className="text-xs text-muted-foreground mb-1">Avg. Price</p>
+                          <p className="text-sm sm:text-base font-bold text-primary">{MARKETS_DATA[activeMarket].yes}¢</p>
+                          <p className="text-xs text-muted-foreground mt-1">entry</p>
+                        </div>
                       </div>
-                      <div className="flex justify-between text-xs sm:text-sm gap-2">
-                        <span className="text-muted-foreground truncate">Value</span>
-                        <span className="text-success font-medium whitespace-nowrap">$62.50</span>
+                      
+                      {/* Card 3: Value */}
+                      <div className="relative group perspective">
+                        <div className="relative p-2.5 sm:p-3 rounded-lg border border-border bg-gradient-to-br from-card to-secondary/50 transition-all duration-300 group-hover:border-success/50 group-hover:shadow-lg group-hover:shadow-success/20" style={{ transform: "rotateX(5deg) rotateY(5deg)" }}>
+                          <p className="text-xs text-muted-foreground mb-1">Value</p>
+                          <p className="text-sm sm:text-base font-bold text-success">$62.50</p>
+                          <p className="text-xs text-success mt-1">+25%</p>
+                        </div>
                       </div>
                     </div>
+                    
                     {/* Mini chart line */}
-                    <div className="mt-3 h-6 sm:h-8 flex items-end gap-0.5">
-                      {[40, 55, 48, 62, 58, 70, 65, 78, 72, 85].map((h, i) => (
-                        <div
-                          key={i}
-                          className="flex-1 bg-success/60 rounded-t transition-all duration-300"
-                          style={{ height: `${h}%`, transitionDelay: `${i * 50}ms` }}
-                        />
-                      ))}
+                    <div className="mt-4 p-2 sm:p-3 rounded-lg border border-border/50 bg-card/30 backdrop-blur">
+                      <p className="text-xs text-muted-foreground mb-2">Price Movement</p>
+                      <div className="h-6 sm:h-8 flex items-end gap-0.5">
+                        {[40, 55, 48, 62, 58, 70, 65, 78, 72, 85].map((h, i) => (
+                          <div
+                            key={i}
+                            className="flex-1 bg-gradient-to-t from-primary to-primary/50 rounded-t transition-all duration-300"
+                            style={{ height: `${h}%`, transitionDelay: `${i * 50}ms`, boxShadow: `0 0 6px rgba(var(--primary), 0.3)` }}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
