@@ -56,34 +56,175 @@ export function HeroSection() {
 
       <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:py-24 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-2 lg:items-center lg:gap-12">
-          {/* Content - Now with animated market flow */}
+          {/* Content - Animated Trading Flow Demo */}
           <div className="space-y-6 sm:space-y-8">
-            {/* Flow Steps Indicator */}
-            <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto pb-2">
-              {FLOW_STEPS.map((step, idx) => (
+            {/* Interactive Trading Flow Animation */}
+            <div className="relative rounded-2xl border border-border bg-gradient-to-br from-card via-card to-secondary/30 p-4 sm:p-6 overflow-hidden">
+              {/* Animated background glow */}
+              <div 
+                className={`absolute inset-0 transition-opacity duration-1000 ${
+                  activeStep === 3 ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-success/10 via-transparent to-success/5" />
+              </div>
+
+              {/* Flow Steps Timeline */}
+              <div className="relative mb-6">
+                <div className="flex items-center justify-between">
+                  {FLOW_STEPS.map((step, idx) => (
+                    <div key={step.label} className="flex flex-col items-center relative z-10">
+                      {/* Step Circle */}
+                      <div
+                        className={`relative flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full border-2 transition-all duration-500 ${
+                          idx < activeStep
+                            ? "border-success bg-success text-success-foreground scale-100"
+                            : idx === activeStep
+                              ? "border-primary bg-primary text-primary-foreground scale-110 shadow-lg shadow-primary/30"
+                              : "border-muted bg-muted/50 text-muted-foreground scale-90"
+                        }`}
+                      >
+                        {idx < activeStep ? (
+                          <Check className="h-5 w-5 sm:h-6 sm:w-6" />
+                        ) : idx === activeStep ? (
+                          <div className="relative">
+                            <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 animate-pulse" />
+                            {/* Ripple effect */}
+                            <span className="absolute inset-0 animate-ping rounded-full bg-primary/30" />
+                          </div>
+                        ) : (
+                          <span className="text-sm font-bold">{idx + 1}</span>
+                        )}
+                      </div>
+                      {/* Step Label */}
+                      <span
+                        className={`mt-2 text-xs font-medium transition-colors duration-300 text-center ${
+                          idx <= activeStep ? "text-foreground" : "text-muted-foreground"
+                        }`}
+                      >
+                        <span className="hidden sm:inline">{step.label}</span>
+                        <span className="sm:hidden">{step.label.split(" ")[0]}</span>
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                {/* Progress Line */}
+                <div className="absolute top-5 sm:top-6 left-6 right-6 sm:left-8 sm:right-8 h-0.5 bg-muted -z-0">
+                  <div
+                    className="h-full bg-gradient-to-r from-success via-primary to-primary transition-all duration-700 ease-out"
+                    style={{ width: `${(activeStep / (FLOW_STEPS.length - 1)) * 100}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Dynamic Content Based on Step */}
+              <div className="relative min-h-[140px] sm:min-h-[160px]">
+                {/* Step 0: Browse Markets */}
                 <div
-                  key={step.label}
-                  className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-500 ${
-                    idx === activeStep
-                      ? "bg-primary text-primary-foreground scale-105"
-                      : idx < activeStep
-                        ? "bg-success/20 text-success"
-                        : "bg-secondary text-muted-foreground"
+                  className={`absolute inset-0 transition-all duration-500 ${
+                    activeStep === 0 ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8 pointer-events-none"
                   }`}
                 >
-                  {idx < activeStep ? (
-                    <Check className="h-3 w-3" />
-                  ) : idx === activeStep ? (
-                    <Sparkles className="h-3 w-3 animate-pulse" />
-                  ) : (
-                    <span className="h-3 w-3 rounded-full border border-current opacity-50" />
-                  )}
-                  <span className="hidden sm:inline">{step.label}</span>
-                  {idx < FLOW_STEPS.length - 1 && (
-                    <ChevronRight className="h-3 w-3 ml-1 text-muted-foreground hidden sm:block" />
-                  )}
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50 border border-border">
+                    <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                      <TrendingUp className="h-6 w-6 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-muted-foreground mb-0.5">Browsing markets...</p>
+                      <p className="font-semibold text-foreground text-sm sm:text-base truncate">
+                        {MARKETS_DATA[activeMarket].title}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge variant="secondary" className="text-xs">{MARKETS_DATA[activeMarket].category}</Badge>
+                        <span className="text-xs text-muted-foreground">{MARKETS_DATA[activeMarket].volume} vol</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              ))}
+
+                {/* Step 1: Place Trade */}
+                <div
+                  className={`absolute inset-0 transition-all duration-500 ${
+                    activeStep === 1 ? "opacity-100 translate-x-0" : activeStep < 1 ? "opacity-0 translate-x-8 pointer-events-none" : "opacity-0 -translate-x-8 pointer-events-none"
+                  }`}
+                >
+                  <div className="p-3 rounded-xl bg-secondary/50 border border-border">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-medium text-foreground">Place Your Trade</span>
+                      <Badge className="bg-primary/10 text-primary text-xs">YES @ {MARKETS_DATA[activeMarket].yes}¢</Badge>
+                    </div>
+                    <div className="flex gap-2 mb-3">
+                      <Button size="sm" className="flex-1 bg-success hover:bg-success/90 text-success-foreground h-10 text-sm font-semibold">
+                        Yes {MARKETS_DATA[activeMarket].yes}¢
+                      </Button>
+                      <Button size="sm" variant="outline" className="flex-1 border-danger/30 text-danger hover:bg-danger/10 h-10 text-sm font-semibold">
+                        No {100 - MARKETS_DATA[activeMarket].yes}¢
+                      </Button>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>Amount: $50.00</span>
+                      <span>Est. payout: ${(50 / (MARKETS_DATA[activeMarket].yes / 100)).toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step 2: Track Position */}
+                <div
+                  className={`absolute inset-0 transition-all duration-500 ${
+                    activeStep === 2 ? "opacity-100 translate-x-0" : activeStep < 2 ? "opacity-0 translate-x-8 pointer-events-none" : "opacity-0 -translate-x-8 pointer-events-none"
+                  }`}
+                >
+                  <div className="p-3 rounded-xl bg-secondary/50 border border-border">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-medium text-foreground">Your Position</span>
+                      <span className="text-xs text-success font-medium">+$12.50 (25%)</span>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Shares</span>
+                        <span className="text-foreground font-medium">75 YES</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Avg. Price</span>
+                        <span className="text-foreground font-medium">{MARKETS_DATA[activeMarket].yes}¢</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Current Value</span>
+                        <span className="text-success font-medium">$62.50</span>
+                      </div>
+                    </div>
+                    {/* Mini chart line */}
+                    <div className="mt-3 h-8 flex items-end gap-0.5">
+                      {[40, 55, 48, 62, 58, 70, 65, 78, 72, 85].map((h, i) => (
+                        <div
+                          key={i}
+                          className="flex-1 bg-success/60 rounded-t transition-all duration-300"
+                          style={{ height: `${h}%`, transitionDelay: `${i * 50}ms` }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step 3: Purchased/Settled */}
+                <div
+                  className={`absolute inset-0 transition-all duration-500 ${
+                    activeStep === 3 ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
+                  }`}
+                >
+                  <div className="p-4 rounded-xl bg-gradient-to-br from-success/20 to-success/5 border border-success/30 text-center">
+                    <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-success mb-3">
+                      <Check className="h-8 w-8 text-success-foreground" />
+                    </div>
+                    <h4 className="text-lg font-bold text-foreground mb-1">Trade Successful!</h4>
+                    <p className="text-sm text-muted-foreground mb-3">Your position is now active</p>
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-success/20 text-success text-sm font-medium">
+                      <Sparkles className="h-4 w-4" />
+                      +$37.50 Potential Profit
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl xl:text-6xl text-balance">
@@ -93,43 +234,6 @@ export function HeroSection() {
             <p className="max-w-lg text-base sm:text-lg text-muted-foreground text-pretty">
               Whether is a social prediction trading app where people trade on real-world events, discuss their reasoning, and get AI-powered market analysis — built on Solana.
             </p>
-
-            {/* Animated Mini Market Cards */}
-            <div className="relative h-24 overflow-hidden rounded-xl border border-border bg-card/50 backdrop-blur">
-              <div
-                className={`absolute inset-0 flex items-center px-4 transition-all duration-500 ${
-                  isAnimating ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"
-                }`}
-              >
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Badge variant="secondary" className="text-xs">
-                      {MARKETS_DATA[activeMarket].category}
-                    </Badge>
-                    <span className="text-xs text-muted-foreground">{MARKETS_DATA[activeMarket].volume}</span>
-                  </div>
-                  <p className="font-medium text-foreground text-sm sm:text-base line-clamp-1">
-                    {MARKETS_DATA[activeMarket].title}
-                  </p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="text-right">
-                    <p className="text-xs text-muted-foreground">Yes</p>
-                    <p className="text-lg font-bold text-success">{MARKETS_DATA[activeMarket].yes}¢</p>
-                  </div>
-                  <div className="h-10 w-10 rounded-full bg-success/20 flex items-center justify-center">
-                    <TrendingUp className="h-5 w-5 text-success" />
-                  </div>
-                </div>
-              </div>
-              {/* Progress bar */}
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-muted">
-                <div
-                  className="h-full bg-primary transition-all duration-[3000ms] ease-linear"
-                  style={{ width: isAnimating ? "0%" : "100%" }}
-                />
-              </div>
-            </div>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
               <Link href="/markets" className="w-full sm:w-auto">
