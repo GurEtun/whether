@@ -61,6 +61,11 @@ export function Header() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            <Link href="/browse">
+              <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
+                Browse
+              </Button>
+            </Link>
             <Link href="/portfolio">
               <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
                 Portfolio
@@ -173,6 +178,9 @@ export function Header() {
                 className="rounded-lg px-3 py-2 text-muted-foreground hover:bg-secondary"
               >
                 🎬 Entertainment
+              </Link>
+              <Link href="/browse" className="rounded-lg px-3 py-2 text-muted-foreground hover:bg-secondary">
+                Browse
               </Link>
               <Link href="/portfolio" className="rounded-lg px-3 py-2 text-muted-foreground hover:bg-secondary">
                 Portfolio
