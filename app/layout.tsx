@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { DynamicProvider } from "@/lib/dynamic-provider"
 import { QueryProvider } from "@/components/providers/query-provider"
+import { ThemeProvider } from "@/components/theme-provider"
 import { ScrollToTop } from "@/components/scroll-to-top"
 import "./globals.css"
 
@@ -22,14 +23,16 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" suppressHydrationWarning>
       <body className={`font-sans antialiased`}>
-        <QueryProvider>
-          <DynamicProvider>
-            <ScrollToTop />
-            {children}
-          </DynamicProvider>
-        </QueryProvider>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+          <QueryProvider>
+            <DynamicProvider>
+              <ScrollToTop />
+              {children}
+            </DynamicProvider>
+          </QueryProvider>
+        </ThemeProvider>
         <Analytics />
       </body>
     </html>

@@ -4,7 +4,56 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Prediction Market - Dark Trading Theme */
+  /* Light Mode - Glassmorphism Theme */
+  --background: oklch(0.98 0.005 260);
+  --foreground: oklch(0.15 0.01 260);
+  --card: oklch(0.99 0.003 260);
+  --card-foreground: oklch(0.15 0.01 260);
+  --popover: oklch(0.99 0.003 260);
+  --popover-foreground: oklch(0.15 0.01 260);
+  --primary: oklch(0.55 0.2 165);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.95 0.005 260);
+  --secondary-foreground: oklch(0.15 0.01 260);
+  --muted: oklch(0.96 0.005 260);
+  --muted-foreground: oklch(0.45 0.01 260);
+  --accent: oklch(0.55 0.2 165);
+  --accent-foreground: oklch(0.99 0 0);
+  --destructive: oklch(0.6 0.22 25);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.90 0.005 260);
+  --input: oklch(0.95 0.005 260);
+  --ring: oklch(0.55 0.2 165);
+
+  /* Custom trading colors */
+  --success: oklch(0.55 0.2 145);
+  --success-foreground: oklch(0.99 0 0);
+  --danger: oklch(0.6 0.22 25);
+  --danger-foreground: oklch(0.99 0 0);
+  --warning: oklch(0.7 0.18 85);
+
+  /* Glassmorphism specific */
+  --glass-background: oklch(0.99 0.003 260 / 0.7);
+  --glass-border: oklch(0.90 0.005 260 / 0.3);
+
+  --chart-1: oklch(0.55 0.2 165);
+  --chart-2: oklch(0.6 0.22 25);
+  --chart-3: oklch(0.6 0.18 250);
+  --chart-4: oklch(0.7 0.18 85);
+  --chart-5: oklch(0.65 0.2 330);
+  --radius: 0.75rem;
+  --sidebar: oklch(0.99 0.003 260);
+  --sidebar-foreground: oklch(0.15 0.01 260);
+  --sidebar-primary: oklch(0.55 0.2 165);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.95 0.005 260);
+  --sidebar-accent-foreground: oklch(0.15 0.01 260);
+  --sidebar-border: oklch(0.90 0.005 260);
+  --sidebar-ring: oklch(0.55 0.2 165);
+}
+
+.dark {
+  /* Dark Mode - Glassmorphism Theme */
   --background: oklch(0.13 0.01 260);
   --foreground: oklch(0.96 0 0);
   --card: oklch(0.16 0.01 260);
@@ -24,7 +73,7 @@
   --border: oklch(0.26 0.01 260);
   --input: oklch(0.22 0.01 260);
   --ring: oklch(0.72 0.19 145);
-
+  
   /* Custom trading colors */
   --success: oklch(0.72 0.19 145);
   --success-foreground: oklch(0.13 0.01 260);
@@ -32,42 +81,10 @@
   --danger-foreground: oklch(0.96 0 0);
   --warning: oklch(0.8 0.15 85);
 
-  --chart-1: oklch(0.72 0.19 145);
-  --chart-2: oklch(0.65 0.2 25);
-  --chart-3: oklch(0.7 0.15 250);
-  --chart-4: oklch(0.8 0.15 85);
-  --chart-5: oklch(0.7 0.18 330);
-  --radius: 0.5rem;
-  --sidebar: oklch(0.16 0.01 260);
-  --sidebar-foreground: oklch(0.96 0 0);
-  --sidebar-primary: oklch(0.72 0.19 145);
-  --sidebar-primary-foreground: oklch(0.13 0.01 260);
-  --sidebar-accent: oklch(0.22 0.01 260);
-  --sidebar-accent-foreground: oklch(0.96 0 0);
-  --sidebar-border: oklch(0.26 0.01 260);
-  --sidebar-ring: oklch(0.72 0.19 145);
-}
+  /* Glassmorphism specific */
+  --glass-background: oklch(0.16 0.01 260 / 0.7);
+  --glass-border: oklch(0.26 0.01 260 / 0.5);
 
-.dark {
-  --background: oklch(0.13 0.01 260);
-  --foreground: oklch(0.96 0 0);
-  --card: oklch(0.16 0.01 260);
-  --card-foreground: oklch(0.96 0 0);
-  --popover: oklch(0.16 0.01 260);
-  --popover-foreground: oklch(0.96 0 0);
-  --primary: oklch(0.72 0.19 145);
-  --primary-foreground: oklch(0.13 0.01 260);
-  --secondary: oklch(0.22 0.01 260);
-  --secondary-foreground: oklch(0.96 0 0);
-  --muted: oklch(0.22 0.01 260);
-  --muted-foreground: oklch(0.65 0 0);
-  --accent: oklch(0.72 0.19 145);
-  --accent-foreground: oklch(0.13 0.01 260);
-  --destructive: oklch(0.65 0.2 25);
-  --destructive-foreground: oklch(0.96 0 0);
-  --border: oklch(0.26 0.01 260);
-  --input: oklch(0.22 0.01 260);
-  --ring: oklch(0.72 0.19 145);
   --chart-1: oklch(0.72 0.19 145);
   --chart-2: oklch(0.65 0.2 25);
   --chart-3: oklch(0.7 0.15 250);
@@ -135,6 +152,20 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-card/70 backdrop-blur-xl border-border/50;
+  }
+  
+  .glass-strong {
+    @apply bg-card/80 backdrop-blur-2xl border-border/60 shadow-lg;
+  }
+  
+  .glass-subtle {
+    @apply bg-card/50 backdrop-blur-md border-border/30;
   }
 }
 

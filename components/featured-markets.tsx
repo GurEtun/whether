@@ -54,7 +54,7 @@ export function FeaturedMarkets() {
         {isLoading && featuredMarkets.length === 0 && (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[...Array(6)].map((_, i) => (
-              <Card key={i} className="h-full border-border bg-card">
+              <Card key={i} className="h-full glass">
                 <CardHeader className="pb-3">
                   <div className="h-5 w-16 bg-accent animate-pulse rounded" />
                   <div className="h-6 w-full bg-accent animate-pulse rounded mt-2" />
@@ -128,7 +128,7 @@ function MarketCard({ market }: { market: TransformedMarket }) {
 
   return (
     <Link href={`/markets/${market.id}`}>
-      <Card className="group cursor-pointer border-border bg-card transition-all hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 h-full">
+      <Card className="group cursor-pointer glass transition-all hover:glass-strong hover:shadow-xl hover:shadow-primary/10 h-full">
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between gap-2">
             <Badge variant="secondary" className="bg-secondary text-xs font-normal text-muted-foreground capitalize">

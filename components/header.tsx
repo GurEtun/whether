@@ -7,13 +7,14 @@ import { Input } from "@/components/ui/input"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Search, Menu, X, ChevronDown, TrendingUp, BarChart3 } from "lucide-react"
 import { WalletButton } from "@/components/wallet-button"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b glass-strong">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
           <Link href="/" className="flex items-center">
@@ -109,7 +110,7 @@ export function Header() {
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Search markets..."
-                className="w-64 bg-secondary pl-9 text-sm placeholder:text-muted-foreground"
+                className="w-64 glass pl-9 text-sm placeholder:text-muted-foreground"
               />
               <kbd className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded border border-border bg-muted px-1.5 text-xs text-muted-foreground">
                 ⌘K
@@ -120,6 +121,8 @@ export function Header() {
             <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsSearchOpen(!isSearchOpen)}>
               <Search className="h-5 w-5" />
             </Button>
+
+            <ThemeToggle />
 
             <div className="hidden sm:block">
               <WalletButton />
