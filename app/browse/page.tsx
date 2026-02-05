@@ -1,5 +1,7 @@
 import { Metadata } from "next"
+import { Suspense } from "react"
 import { SocialFeed } from "@/components/social-feed"
+import { BrowseSkeleton } from "@/components/skeletons/browse-skeleton"
 
 export const metadata: Metadata = {
   title: "Browse - Whether",
@@ -17,7 +19,9 @@ export default function BrowsePage() {
           </p>
         </div>
         
-        <SocialFeed />
+        <Suspense fallback={<BrowseSkeleton />}>
+          <SocialFeed />
+        </Suspense>
       </div>
     </main>
   )

@@ -19,6 +19,9 @@ const mockNetworkPosts = [
     taggedMarkets: [
       { id: "btc-150k", title: "BTC reaches $150K by March 2026?", yesPrice: 67, category: "Crypto" }
     ],
+    media: [
+      { type: "image" as const, url: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=800&q=80" }
+    ],
     createdAt: new Date(Date.now() - 1000 * 60 * 30),
     likes: 124,
     comments: 38,
@@ -139,6 +142,31 @@ export function SocialFeed() {
                 <p className="text-foreground leading-relaxed">{post.content}</p>
               </div>
             </div>
+
+            {/* Media Gallery */}
+            {post.media && post.media.length > 0 && (
+              <div className={`mb-4 grid gap-2 rounded-lg overflow-hidden ${
+                post.media.length === 1 ? "grid-cols-1" : "grid-cols-2"
+              }`}>
+                {post.media.map((media, idx) => (
+                  <div key={idx} className="relative bg-secondary/20 rounded-lg overflow-hidden">
+                    {media.type === "image" ? (
+                      <img
+                        src={media.url}
+                        alt="Post media"
+                        className="w-full h-48 sm:h-64 object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
+                      />
+                    ) : (
+                      <video
+                        src={media.url}
+                        controls
+                        className="w-full h-48 sm:h-64 object-cover"
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Tagged Markets */}
             {post.taggedMarkets.length > 0 && (
