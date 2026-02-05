@@ -37,17 +37,20 @@ export function TrendingMarkets() {
           {isLoading && displayData.length === 0 ? (
             // Loading skeleton
             [...Array(5)].map((_, i) => (
-              <Card key={i} className="min-w-[280px] shrink-0 border-border bg-card p-4 animate-pulse">
+              <Card key={i} className="min-w-[280px] shrink-0 border-border bg-card p-4">
                 <div className="flex items-start justify-between gap-2">
-                  <div className="h-5 w-16 bg-muted rounded" />
-                  <div className="h-5 w-12 bg-muted rounded" />
+                  <div className="h-5 w-16 bg-accent animate-pulse rounded" />
+                  <div className="h-5 w-12 bg-accent animate-pulse rounded" />
                 </div>
-                <div className="mt-3 h-10 bg-muted rounded" />
+                <div className="mt-3 space-y-2">
+                  <div className="h-4 w-full bg-accent animate-pulse rounded" />
+                  <div className="h-4 w-3/4 bg-accent animate-pulse rounded" />
+                </div>
                 <div className="mt-4 flex items-center justify-between">
-                  <div className="h-8 w-16 bg-muted rounded" />
+                  <div className="h-8 w-16 bg-accent animate-pulse rounded" />
                   <div className="flex gap-1">
-                    <div className="h-7 w-12 bg-muted rounded" />
-                    <div className="h-7 w-12 bg-muted rounded" />
+                    <div className="h-7 w-12 bg-accent animate-pulse rounded" />
+                    <div className="h-7 w-12 bg-accent animate-pulse rounded" />
                   </div>
                 </div>
               </Card>

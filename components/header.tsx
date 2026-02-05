@@ -66,6 +66,11 @@ export function Header() {
                 Portfolio
               </Button>
             </Link>
+            <Link href="/profile">
+              <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
+                Profile
+              </Button>
+            </Link>
             <Link href="/leaderboard">
               <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
                 Leaderboard
@@ -171,6 +176,9 @@ export function Header() {
               </Link>
               <Link href="/portfolio" className="rounded-lg px-3 py-2 text-muted-foreground hover:bg-secondary">
                 Portfolio
+              </Link>
+              <Link href="/profile" className="rounded-lg px-3 py-2 text-muted-foreground hover:bg-secondary">
+                Profile
               </Link>
               <Link href="/leaderboard" className="rounded-lg px-3 py-2 text-muted-foreground hover:bg-secondary">
                 Leaderboard

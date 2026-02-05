@@ -54,17 +54,22 @@ export function FeaturedMarkets() {
         {isLoading && featuredMarkets.length === 0 && (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[...Array(6)].map((_, i) => (
-              <Card key={i} className="animate-pulse h-full">
+              <Card key={i} className="h-full border-border bg-card">
                 <CardHeader className="pb-3">
-                  <div className="h-5 w-16 bg-muted rounded" />
-                  <div className="h-6 w-full bg-muted rounded mt-2" />
+                  <div className="h-5 w-16 bg-accent animate-pulse rounded" />
+                  <div className="h-6 w-full bg-accent animate-pulse rounded mt-2" />
                 </CardHeader>
                 <CardContent className="pb-3">
-                  <div className="h-10 w-24 bg-muted rounded" />
-                  <div className="h-2 w-full bg-muted rounded mt-4" />
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="h-10 w-20 bg-accent animate-pulse rounded" />
+                      <div className="h-8 w-16 bg-accent animate-pulse rounded-full" />
+                    </div>
+                    <div className="h-2 w-full bg-accent animate-pulse rounded" />
+                  </div>
                 </CardContent>
                 <CardFooter className="border-t border-border pt-3">
-                  <div className="h-4 w-full bg-muted rounded" />
+                  <div className="h-4 w-full bg-accent animate-pulse rounded" />
                 </CardFooter>
               </Card>
             ))}
