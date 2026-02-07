@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getCorsHeaders, errorResponse, handleOptions } from "@/lib/jup-client"
+import { tradingEngine } from "@/lib/trading-engine"
 
 export async function OPTIONS() {
   return handleOptions()
@@ -7,6 +8,10 @@ export async function OPTIONS() {
 
 // Generate realistic market data based on market ID
 function generateLiveMarketData(marketId: string) {
+  // Get trading engine prices if available
+  const enginePrices = tradingEngine.getMarketPrice(marketId)
+  const metrics = tradingEngine.getMetrics(marketId)
+  
   const seed = marketId.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0)
   const now = Date.now()
   
@@ -15,7 +20,8 @@ function generateLiveMarketData(marketId: string) {
     return x - Math.floor(x)
   }
 
-  const baseYesPrice = 40 + random(0) * 40
+  // Use engine prices with slight variation
+  const baseYesPrice = enginePrices.yes + (random(0) - 0.5) * 2
   const yesPrice = Math.max(10, Math.min(90, baseYesPrice))
   const noPrice = 100 - yesPrice
 
@@ -23,12 +29,13 @@ function generateLiveMarketData(marketId: string) {
     marketId,
     yesPrice: Math.round(yesPrice * 100) / 100,
     noPrice: Math.round(noPrice * 100) / 100,
-    volume24h: Math.round((100000 + random(1) * 500000) * 100) / 100,
-    totalVolume: Math.round((1000000 + random(2) * 5000000) * 100) / 100,
-    lastTradeTime: now - Math.floor(random(3) * 300000),
-    priceChange24h: Math.round((random(4) - 0.5) * 15 * 100) / 100,
-    liquidity: Math.round((50000 + random(5) * 250000) * 100) / 100,
-    traders24h: Math.floor(50 + random(6) * 500),
+    volume24h: Math.max(100000, metrics.totalVolume + random(1) * 500000),
+    totalVolume: Math.max(1000000, metrics.totalVolume * 10 + random(2) * 5000000),
+    lastTradeTime: metrics.lastTradeTime || now - Math.floor(random(3) * 300000),
+    priceChange24h: Math.round(metrics.priceChange24h * 100) / 100,
+    liquidity: Math.max(50000, random(5) * 250000),
+    traders24h: Math.floor(Math.max(50, metrics.totalTrades * 10 + random(6) * 500)),
+    bidAskSpread: Math.round(metrics.bidAskSpread * 100) / 100,
   }
 }
 
@@ -39,6 +46,11 @@ export async function GET(
   try {
     const { marketId } = await params
     
+    // Validate marketId
+    if (!marketId || typeof marketId !== 'string' || marketId.trim() === '') {
+      return errorResponse("Invalid marketId", 400)
+    }
+    
     // Generate realistic live data
     const liveData = generateLiveMarketData(marketId)
     
@@ -47,6 +59,7 @@ export async function GET(
       headers: {
         ...getCorsHeaders(),
         "Cache-Control": "no-cache, no-store, must-revalidate",
+        "X-Live-Data": "true",
       },
     })
   } catch (error) {

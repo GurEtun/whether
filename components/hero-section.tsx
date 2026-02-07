@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ArrowRight, TrendingUp, Shield, Zap, Activity, Layers } from "lucide-react"
 import Link from "next/link"
+import { TradingFlowAnimation } from "./trading-flow-animation"
 
 export function HeroSection() {
   return (
@@ -61,46 +62,7 @@ export function HeroSection() {
           </div>
 
           <div className="relative">
-            <div className="rounded-2xl border border-border bg-card p-4 shadow-2xl sm:p-6">
-              <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="bg-success/10 text-success text-xs sm:text-sm">
-                    <span className="mr-1.5 h-2 w-2 animate-pulse rounded-full bg-success" />
-                    Active
-                  </Badge>
-                  <Badge variant="outline" className="text-xs text-muted-foreground">
-                    Binary
-                  </Badge>
-                </div>
-                <span className="text-xs sm:text-sm text-muted-foreground">Closes in 14d 6h</span>
-              </div>
-
-              <h3 className="mb-2 text-lg font-semibold text-foreground sm:text-xl">
-                Will BTC reach $150K by March 2026?
-              </h3>
-
-              <p className="mb-4 sm:mb-6 text-sm text-muted-foreground">
-                Resolves Yes if Bitcoin price exceeds $150,000 on CoinGecko before March 31, 2026.
-              </p>
-
-              <div className="mb-4 sm:mb-6 space-y-3">
-                <MarketOption label="Yes" probability={67} color="success" />
-                <MarketOption label="No" probability={33} color="danger" />
-              </div>
-
-              <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-4 text-xs sm:text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1">
-                    <TrendingUp className="h-4 w-4" /> $1.2M Volume
-                  </span>
-                </div>
-                <Link href="/markets/btc-150k-march-2026" className="w-full sm:w-auto">
-                  <Button size="sm" className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
-                    Trade Now
-                  </Button>
-                </Link>
-              </div>
-            </div>
+            <TradingFlowAnimation />
 
             <div className="absolute -right-4 top-4 hidden rounded-xl border border-border bg-card p-3 shadow-lg xl:block">
               <div className="flex items-center gap-2">

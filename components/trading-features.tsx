@@ -4,7 +4,10 @@ import type React from "react"
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Zap, Route, Shield, Clock, ArrowLeftRight, Coins, GitBranch, CheckCircle2 } from "lucide-react"
+import { Zap, Route, Shield, Clock, ArrowLeftRight, Coins, GitBranch, CheckCircle2, Wallet } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { useWalletTrading } from "@/hooks/use-wallet-trading"
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core"
 
 const features = [
   {
@@ -46,6 +49,9 @@ const features = [
 ]
 
 export function TradingFeatures() {
+  const { isConnected } = useWalletTrading()
+  const { setShowAuthFlow } = useDynamicContext()
+
   return (
     <section className="border-y border-border bg-card/30 py-12 sm:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -67,15 +73,29 @@ export function TradingFeatures() {
         
 
         <div className="mt-8 rounded-2xl border border-border bg-card p-4 sm:mt-12 sm:p-6">
-          <h3 className="text-center text-base sm:text-lg font-semibold text-foreground mb-4 sm:mb-6">
-            Complete Trading Lifecycle
-          </h3>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-base sm:text-lg font-semibold text-foreground">
+              Complete Trading Lifecycle
+            </h3>
+            {!isConnected && (
+              <Button
+                onClick={() => setShowAuthFlow?.(true)}
+                size="sm"
+                className="gap-2"
+              >
+                <Wallet className="h-4 w-4" />
+                Connect Wallet
+              </Button>
+            )}
+          </div>
           <div className="flex flex-col items-start gap-6 sm:items-center md:flex-row md:justify-center md:gap-0">
             <LifecycleStep
               step={1}
               title="Discover Markets"
               description="Filter by categories, tags, status"
               icon={<Route className="h-4 w-4 sm:h-5 sm:w-5" />}
+              requiresWallet={false}
+              walletConnected={isConnected}
             />
             <StepConnector />
             <LifecycleStep
@@ -83,6 +103,8 @@ export function TradingFeatures() {
               title="Trade Tokens"
               description="Buy/sell outcome tokens"
               icon={<ArrowLeftRight className="h-4 w-4 sm:h-5 sm:w-5" />}
+              requiresWallet={true}
+              walletConnected={isConnected}
             />
             <StepConnector />
             <LifecycleStep
@@ -90,6 +112,8 @@ export function TradingFeatures() {
               title="Track Positions"
               description="On-chain portfolio view"
               icon={<Clock className="h-4 w-4 sm:h-5 sm:w-5" />}
+              requiresWallet={true}
+              walletConnected={isConnected}
             />
             <StepConnector />
             <LifecycleStep
@@ -97,6 +121,8 @@ export function TradingFeatures() {
               title="Redeem Resolved Outcomes"
               description="Redeem settled tokens"
               icon={<CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5" />}
+              requiresWallet={true}
+              walletConnected={isConnected}
             />
           </div>
         </div>
@@ -110,23 +136,56 @@ function LifecycleStep({
   title,
   description,
   icon,
+  requiresWallet,
+  walletConnected,
 }: {
   step: number
   title: string
   description: string
   icon: React.ReactNode
+  requiresWallet: boolean
+  walletConnected: boolean
 }) {
+  const isAvailable = !requiresWallet || walletConnected
+
   return (
-    <div className="flex items-center gap-4 text-left md:flex-col md:text-center md:px-4 w-full md:w-auto">
-      <div className="flex h-12 w-12 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary relative">
+    <div
+      className={`flex items-center gap-4 text-left md:flex-col md:text-center md:px-4 w-full md:w-auto transition-opacity ${
+        isAvailable ? "" : "opacity-50"
+      }`}
+    >
+      <div
+        className={`flex h-12 w-12 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-full relative ${
+          isAvailable ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+        }`}
+      >
         {icon}
-        <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+        <span
+          className={`absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold ${
+            isAvailable
+              ? "bg-primary text-primary-foreground"
+              : "bg-muted-foreground text-background"
+          }`}
+        >
           {step}
         </span>
+        {requiresWallet && !walletConnected && (
+          <Wallet className="absolute -bottom-1 -right-1 h-4 w-4 text-warning" />
+        )}
       </div>
       <div className="flex-1 md:flex-none">
-        <h4 className="font-semibold text-foreground text-sm sm:text-base">{title}</h4>
-        <p className="text-xs sm:text-sm text-muted-foreground mt-1">{description}</p>
+        <h4 className={`font-semibold text-sm sm:text-base ${isAvailable ? "text-foreground" : "text-muted-foreground"}`}>
+          {title}
+        </h4>
+        <p className={`text-xs sm:text-sm mt-1 ${isAvailable ? "text-muted-foreground" : "text-muted-foreground/50"}`}>
+          {description}
+        </p>
+        {requiresWallet && !walletConnected && (
+          <p className="text-xs text-warning mt-2 flex items-center gap-1">
+            <Wallet className="h-3 w-3" />
+            Requires wallet connection
+          </p>
+        )}
       </div>
     </div>
   )

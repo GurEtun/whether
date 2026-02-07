@@ -42,9 +42,14 @@ export async function GET(
     
     return NextResponse.json(stats, {
       status: 200,
-      headers: getCorsHeaders(),
+      headers: {
+        ...getCorsHeaders(),
+        "Cache-Control": "max-age=10, must-revalidate",
+      },
     })
   } catch (error) {
-    return errorResponse("Failed to fetch market stats", 500, error)
+    console.error("[jup-stats] Error:", error)
+    const message = error instanceof Error ? error.message : "Unknown error"
+    return errorResponse("Failed to fetch market stats", 500, { message })
   }
 }
