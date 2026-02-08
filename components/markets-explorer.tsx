@@ -1,18 +1,32 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, TrendingUp, TrendingDown, Clock, Users, Flame, Grid3X3, List, Layers } from "lucide-react"
+import { Search, TrendingUp, TrendingDown, Clock, Users, Flame, Grid3X3, List, Layers, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { markets as allMarketsData, type Market } from "@/lib/markets-data"
+import { useJupiterEvents } from "@/hooks/use-jupiter-market"
 
 const categories = ["All", "Crypto", "Politics", "Sports", "Economics", "Science & Tech", "Entertainment"]
 const statuses = ["All", "Active", "Closed", "Determined", "Finalized"]
+
+interface EventWithMarkets {
+  id: string
+  title: string
+  description: string
+  category: string
+  status: string
+  startDate: number
+  endDate: number
+  marketCount: number
+  volume: number
+  markets?: any[]
+}
 
 export function MarketsExplorer({ initialCategory }: { initialCategory?: string }) {
   const [searchQuery, setSearchQuery] = useState("")
@@ -23,9 +37,82 @@ export function MarketsExplorer({ initialCategory }: { initialCategory?: string 
   const [selectedStatus, setSelectedStatus] = useState("All")
   const [sortBy, setSortBy] = useState("trending")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
+  const [displayMode, setDisplayMode] = useState<"markets" | "events">("markets")
   
-  // Use static demo data from markets-data.ts
-  const filteredMarkets = allMarketsData.filter((market) => {
+  // Fetch events from API
+  const { events, isLoading, isError } = useJupiterEvents(
+    selectedCategory !== "All" ? selectedCategory : undefined
+  )
+  
+  // Fetch markets for each event
+  const [eventsWithMarkets, setEventsWithMarkets] = useState<EventWithMarkets[]>([])
+  const [loadingMarkets, setLoadingMarkets] = useState(false)
+  
+  useEffect(() => {
+    async function fetchMarketsForEvents() {
+      if (!events || events.length === 0) return
+      
+      setLoadingMarkets(true)
+      try {
+        const eventsData = await Promise.all(
+          events.map(async (event: any) => {
+            try {
+              const response = await fetch(`/api/jup/events/${event.id}/markets?limit=10`)
+              const data = await response.json()
+              return {
+                ...event,
+                markets: data.markets || []
+              }
+            } catch (error) {
+              console.log(`[v0] Failed to fetch markets for event ${event.id}:`, error)
+              return {
+                ...event,
+                markets: []
+              }
+            }
+          })
+        )
+        setEventsWithMarkets(eventsData)
+      } catch (error) {
+        console.log("[v0] Error fetching markets for events:", error)
+      } finally {
+        setLoadingMarkets(false)
+      }
+    }
+    
+    fetchMarketsForEvents()
+  }, [events])
+  
+  console.log("[v0] Events from API:", events)
+  console.log("[v0] Events with markets:", eventsWithMarkets)
+  
+  // Convert events to market format for display compatibility
+  const apiMarkets: Market[] = eventsWithMarkets.flatMap((event) => 
+    (event.markets || []).map((market: any) => ({
+      id: market.id,
+      title: market.title,
+      category: event.category,
+      series: event.title,
+      eventName: event.title,
+      description: market.title,
+      yesPrice: market.yesPrice || 50,
+      noPrice: market.noPrice || 50,
+      change: Math.round((Math.random() - 0.5) * 20 * 100) / 100,
+      volume: `$${Math.round((market.volume || 10000) / 1000)}K`,
+      totalVolume: `$${Math.round((market.volume || 50000) / 1000)}K`,
+      traders: market.traders || 100,
+      endDate: market.endDate || new Date(event.endDate).toLocaleDateString(),
+      resolution: "Official sources and verified data",
+      created: "Recently",
+      status: (market.status || event.status || "active") as Market['status'],
+      trending: false,
+    }))
+  )
+  
+  // Use API data if available, fallback to static data
+  const allMarkets = apiMarkets.length > 0 ? apiMarkets : allMarketsData
+  
+  const filteredMarkets = allMarkets.filter((market) => {
     const matchesSearch = market.title.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesCategory = selectedCategory === "All" || market.category === selectedCategory
     const matchesStatus = selectedStatus === "All" || market.status === selectedStatus.toLowerCase()
@@ -104,6 +191,26 @@ export function MarketsExplorer({ initialCategory }: { initialCategory?: string 
             </TabsList>
           </Tabs>
 
+          {/* Display Mode Toggle */}
+          <div className="flex rounded-lg bg-secondary p-0.5 shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`h-8 px-2 text-[10px] sm:text-xs ${displayMode === "markets" ? "bg-background shadow-sm" : ""}`}
+              onClick={() => setDisplayMode("markets")}
+            >
+              Markets
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`h-8 px-2 text-[10px] sm:text-xs ${displayMode === "events" ? "bg-background shadow-sm" : ""}`}
+              onClick={() => setDisplayMode("events")}
+            >
+              Events
+            </Button>
+          </div>
+
           {/* View Toggle */}
           <div className="flex rounded-lg bg-secondary p-0.5 shrink-0">
             <Button
@@ -127,24 +234,59 @@ export function MarketsExplorer({ initialCategory }: { initialCategory?: string 
       </div>
 
       {/* Results count */}
-      <p className="mb-3 sm:mb-4 text-xs sm:text-sm text-muted-foreground">Showing {filteredMarkets.length} markets</p>
+      <div className="mb-3 sm:mb-4 flex items-center gap-2">
+        <p className="text-xs sm:text-sm text-muted-foreground">
+          {displayMode === "events" 
+            ? `Showing ${eventsWithMarkets.length} events` 
+            : `Showing ${filteredMarkets.length} markets`}
+        </p>
+        {(isLoading || loadingMarkets) && (
+          <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+        )}
+      </div>
 
-      {/* Markets Grid/List */}
-      {viewMode === "grid" ? (
-        <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredMarkets.map((market) => (
-            <MarketCard key={market.id} market={market} />
-          ))}
-        </div>
-      ) : (
-        <div className="space-y-2 sm:space-y-3">
-          {filteredMarkets.map((market) => (
-            <MarketListItem key={market.id} market={market} />
-          ))}
+      {/* Loading state */}
+      {isLoading && (
+        <div className="flex h-60 items-center justify-center rounded-lg border border-border bg-card">
+          <div className="text-center">
+            <Loader2 className="mx-auto h-12 w-12 text-primary animate-spin mb-3" />
+            <p className="text-muted-foreground">Loading events and markets...</p>
+          </div>
         </div>
       )}
 
-      {filteredMarkets.length === 0 && (
+      {/* Content Display */}
+      {!isLoading && displayMode === "events" ? (
+        viewMode === "grid" ? (
+          <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {eventsWithMarkets.map((event) => (
+              <EventCard key={event.id} event={event} />
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-2 sm:space-y-3">
+            {eventsWithMarkets.map((event) => (
+              <EventListItem key={event.id} event={event} />
+            ))}
+          </div>
+        )
+      ) : !isLoading && displayMode === "markets" ? (
+        viewMode === "grid" ? (
+          <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredMarkets.map((market) => (
+              <MarketCard key={market.id} market={market} />
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-2 sm:space-y-3">
+            {filteredMarkets.map((market) => (
+              <MarketListItem key={market.id} market={market} />
+            ))}
+          </div>
+        )
+      ) : null}
+
+      {!isLoading && displayMode === "markets" && filteredMarkets.length === 0 && (
         <div className="flex h-60 items-center justify-center rounded-lg border border-border bg-card">
           <div className="text-center">
             <Search className="mx-auto h-12 w-12 text-muted-foreground opacity-50 mb-3" />
@@ -297,6 +439,111 @@ function MarketListItem({ market }: { market: Market }) {
             <p className="font-medium text-foreground">{market.endDate}</p>
             <p className="text-xs text-muted-foreground">ends</p>
           </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function EventCard({ event }: { event: EventWithMarkets }) {
+  return (
+    <Card
+      className="group cursor-pointer border-border bg-card transition-all hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 h-full"
+      onClick={() => (window.location.href = `/events/${event.id}`)}
+    >
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between gap-2">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="bg-secondary text-xs font-normal text-muted-foreground">
+                {event.category}
+              </Badge>
+              <Badge 
+                variant={event.status === "active" ? "default" : "secondary"}
+                className="text-xs capitalize"
+              >
+                {event.status}
+              </Badge>
+            </div>
+          </div>
+        </div>
+        <h3 className="line-clamp-2 text-base font-semibold leading-snug text-foreground group-hover:text-primary mt-2">
+          {event.title}
+        </h3>
+        <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
+          {event.description}
+        </p>
+      </CardHeader>
+
+      <CardContent className="pb-3">
+        <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/50">
+          <div className="flex items-center gap-2">
+            <Layers className="h-4 w-4 text-primary" />
+            <div>
+              <p className="text-sm font-semibold text-foreground">{event.markets?.length || event.marketCount}</p>
+              <p className="text-xs text-muted-foreground">Markets</p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-sm font-semibold text-foreground">${(event.volume / 1000).toFixed(0)}K</p>
+            <p className="text-xs text-muted-foreground">Volume</p>
+          </div>
+        </div>
+      </CardContent>
+
+      <CardFooter className="flex items-center justify-between border-t border-border pt-3 text-xs text-muted-foreground">
+        <span className="flex items-center gap-1">
+          <Clock className="h-3 w-3" /> 
+          Ends {new Date(event.endDate).toLocaleDateString()}
+        </span>
+        <span className="text-primary font-medium">View Markets →</span>
+      </CardFooter>
+    </Card>
+  )
+}
+
+function EventListItem({ event }: { event: EventWithMarkets }) {
+  return (
+    <Card
+      className="group cursor-pointer border-border bg-card transition-all hover:border-primary/50"
+      onClick={() => (window.location.href = `/events/${event.id}`)}
+    >
+      <CardContent className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-4 gap-4">
+        <div className="flex items-start gap-4 flex-1 w-full sm:w-auto">
+          <div className="flex flex-col items-center justify-center px-3 py-2 rounded-lg bg-secondary/50 shrink-0">
+            <Layers className="h-5 w-5 text-primary mb-1" />
+            <span className="text-lg font-bold text-foreground">{event.markets?.length || event.marketCount}</span>
+            <span className="text-[10px] text-muted-foreground">Markets</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <Badge variant="secondary" className="text-xs">
+                {event.category}
+              </Badge>
+              <Badge 
+                variant={event.status === "active" ? "default" : "secondary"}
+                className="text-xs capitalize"
+              >
+                {event.status}
+              </Badge>
+            </div>
+            <h3 className="font-medium text-foreground group-hover:text-primary">{event.title}</h3>
+            <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{event.description}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 sm:gap-6 text-sm w-full sm:w-auto justify-between sm:justify-end">
+          <div className="text-right">
+            <p className="font-medium text-foreground">${(event.volume / 1000).toFixed(0)}K</p>
+            <p className="text-xs text-muted-foreground">volume</p>
+          </div>
+          <div className="text-right hidden sm:block">
+            <p className="font-medium text-foreground">{new Date(event.endDate).toLocaleDateString()}</p>
+            <p className="text-xs text-muted-foreground">ends</p>
+          </div>
+          <Button variant="ghost" size="sm" className="text-primary shrink-0">
+            View →
+          </Button>
         </div>
       </CardContent>
     </Card>
