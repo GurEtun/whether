@@ -5,24 +5,63 @@ export async function OPTIONS() {
   return handleOptions()
 }
 
-// Generate realistic markets for an event
+// Generate realistic markets for an event based on event type
 function generateEventMarkets(eventId: string, limit: number = 10) {
   const now = Date.now()
   const seed = eventId.split("-").reduce((acc, s) => acc + parseInt(s || "0", 10), 0)
   const markets = []
 
-  const titles = [
-    "Will the price exceed $50,000?",
-    "Will we see a market rally?",
-    "Is the trend bullish?",
-    "Will volume increase by 20%?",
-    "Market close above support?",
-    "Breakout expected this week?",
-    "Institutional interest high?",
-    "Volatility spike likely?",
-    "New ATH by end of quarter?",
-    "Regulatory clarity expected?",
-  ]
+  // Different market questions based on event ID pattern
+  const marketTemplatesByType = {
+    crypto: [
+      "Will BTC exceed $100,000?",
+      "Will ETH reach $5,000?",
+      "Will SOL hit $300?",
+      "New all-time high this quarter?",
+      "Institutional adoption increases?",
+    ],
+    politics: [
+      "Will legislation pass?",
+      "Voter turnout exceeds 60%?",
+      "Policy implementation by Q2?",
+      "Approval rating above 50%?",
+      "International agreement reached?",
+    ],
+    sports: [
+      "Team wins championship?",
+      "Player wins MVP?",
+      "Record broken this season?",
+      "Playoff qualification?",
+      "Coach of the year award?",
+    ],
+    economics: [
+      "Rate cut by Fed?",
+      "Index reaches new high?",
+      "Unemployment below 4%?",
+      "GDP growth exceeds 3%?",
+      "Market correction occurs?",
+    ],
+    tech: [
+      "Product launch successful?",
+      "Feature release by deadline?",
+      "User milestone reached?",
+      "Market share increases?",
+      "Partnership announced?",
+    ],
+    entertainment: [
+      "Award nomination received?",
+      "Box office exceeds $500M?",
+      "Critical acclaim achieved?",
+      "Sequel greenlit?",
+      "Streaming record broken?",
+    ],
+  }
+
+  // Determine type from seed
+  const types = Object.keys(marketTemplatesByType)
+  const typeIndex = seed % types.length
+  const type = types[typeIndex] as keyof typeof marketTemplatesByType
+  const templates = marketTemplatesByType[type]
 
   for (let i = 0; i < limit; i++) {
     const random = (offset: number) => {
@@ -30,17 +69,17 @@ function generateEventMarkets(eventId: string, limit: number = 10) {
       return x - Math.floor(x)
     }
     
-    const yesPrice = 30 + random(0) * 40
+    const yesPrice = 25 + random(0) * 50
 
     markets.push({
       id: `market-${eventId}-${i + 1}`,
       eventId,
-      title: titles[i % titles.length],
+      title: templates[i % templates.length],
       yesPrice: Math.round(yesPrice * 100) / 100,
       noPrice: Math.round((100 - yesPrice) * 100) / 100,
       volume: Math.round(random(1) * 100000 + 10000),
       traders: Math.floor(random(2) * 1000 + 50),
-      status: i % 3 === 0 ? "closed" : "active",
+      status: i % 5 === 0 ? "closed" : "active",
       endDate: new Date(now + (30 - i) * 86400000).toLocaleDateString(),
     })
   }
