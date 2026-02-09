@@ -283,9 +283,9 @@ currentChange >= 0 ? "bg-success/10 text-success" : "bg-danger/10 text-danger"
 
                     <div className="grid gap-2 sm:gap-4 grid-cols-1 sm:grid-cols-2">
                       <div className="rounded-lg bg-secondary/50 p-2.5 sm:p-4">
-                        <p className="text-[10px] sm:text-sm text-muted-foreground">Resolution Source</p>
-                        <p className="text-[11px] sm:text-base font-medium text-foreground break-words">
-                          {market.resolution}
+                        <p className="text-[10px] sm:text-sm text-muted-foreground">Market ID</p>
+                        <p className="text-[11px] sm:text-base font-medium text-foreground break-words font-mono">
+                          {market.id}
                         </p>
                       </div>
                       <div className="rounded-lg bg-secondary/50 p-2.5 sm:p-4">
@@ -294,17 +294,80 @@ currentChange >= 0 ? "bg-success/10 text-success" : "bg-danger/10 text-danger"
                           {market.status}
                         </p>
                       </div>
-                      <div className="rounded-lg bg-secondary/50 p-2.5 sm:p-4">
-                        <p className="text-[10px] sm:text-sm text-muted-foreground">Series</p>
-                        <p className="text-[11px] sm:text-base font-medium text-foreground break-words">
-                          {market.series}
-                        </p>
-                      </div>
-                      <div className="rounded-lg bg-secondary/50 p-2.5 sm:p-4">
-                        <p className="text-[10px] sm:text-sm text-muted-foreground">Created</p>
-                        <p className="text-[11px] sm:text-base font-medium text-foreground">{market.created}</p>
-                      </div>
+                      {market.eventId && (
+                        <div className="rounded-lg bg-secondary/50 p-2.5 sm:p-4">
+                          <p className="text-[10px] sm:text-sm text-muted-foreground">Event ID</p>
+                          <p className="text-[11px] sm:text-base font-medium text-foreground break-words font-mono">
+                            {market.eventId}
+                          </p>
+                        </div>
+                      )}
+                      {market.resolution && (
+                        <div className="rounded-lg bg-secondary/50 p-2.5 sm:p-4">
+                          <p className="text-[10px] sm:text-sm text-muted-foreground">Resolution Source</p>
+                          <p className="text-[11px] sm:text-base font-medium text-foreground break-words">
+                            {market.resolution}
+                          </p>
+                        </div>
+                      )}
+                      {market.series && (
+                        <div className="rounded-lg bg-secondary/50 p-2.5 sm:p-4">
+                          <p className="text-[10px] sm:text-sm text-muted-foreground">Series</p>
+                          <p className="text-[11px] sm:text-base font-medium text-foreground break-words">
+                            {market.series}
+                          </p>
+                        </div>
+                      )}
+                      {market.created && (
+                        <div className="rounded-lg bg-secondary/50 p-2.5 sm:p-4">
+                          <p className="text-[10px] sm:text-sm text-muted-foreground">Created</p>
+                          <p className="text-[11px] sm:text-base font-medium text-foreground">{market.created}</p>
+                        </div>
+                      )}
+                      {liveData?.liquidity && (
+                        <div className="rounded-lg bg-secondary/50 p-2.5 sm:p-4">
+                          <p className="text-[10px] sm:text-sm text-muted-foreground">Liquidity</p>
+                          <p className="text-[11px] sm:text-base font-medium text-foreground">
+                            ${liveData.liquidity.toLocaleString()}
+                          </p>
+                        </div>
+                      )}
+                      {liveData?.traders24h && (
+                        <div className="rounded-lg bg-secondary/50 p-2.5 sm:p-4">
+                          <p className="text-[10px] sm:text-sm text-muted-foreground">24h Traders</p>
+                          <p className="text-[11px] sm:text-base font-medium text-foreground">
+                            {liveData.traders24h.toLocaleString()}
+                          </p>
+                        </div>
+                      )}
                     </div>
+
+                    {/* Display any additional metadata from the API */}
+                    {liveData && Object.keys(liveData).length > 0 && (
+                      <div className="mt-3 sm:mt-6">
+                        <h4 className="text-xs sm:text-sm font-semibold text-foreground mb-2">Live Market Data</h4>
+                        <div className="grid gap-2 sm:gap-3 grid-cols-2 sm:grid-cols-3 text-[10px] sm:text-xs">
+                          {liveData.highPrice24h !== undefined && (
+                            <div className="rounded-lg bg-success/10 p-2">
+                              <p className="text-muted-foreground">24h High</p>
+                              <p className="font-medium text-foreground">{liveData.highPrice24h}¢</p>
+                            </div>
+                          )}
+                          {liveData.lowPrice24h !== undefined && (
+                            <div className="rounded-lg bg-danger/10 p-2">
+                              <p className="text-muted-foreground">24h Low</p>
+                              <p className="font-medium text-foreground">{liveData.lowPrice24h}¢</p>
+                            </div>
+                          )}
+                          {liveData.trades24h !== undefined && (
+                            <div className="rounded-lg bg-primary/10 p-2">
+                              <p className="text-muted-foreground">24h Trades</p>
+                              <p className="font-medium text-foreground">{liveData.trades24h}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Market Lifecycle Info */}
                     <div className="mt-3 sm:mt-6 rounded-lg border border-border bg-secondary/30 p-2.5 sm:p-4">

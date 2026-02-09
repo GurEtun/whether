@@ -55,12 +55,21 @@ const fetcher = async (url: string) => {
 }
 
 /**
- * Fetch market details from Jupiter API
+ * Fetch market details from Jupiter API with all available data points
  */
 export function useJupiterMarket(marketId: string | null) {
-  const { data, error, isLoading, mutate } = useSWR<JupiterMarket>(
+  const { data, error, isLoading, mutate } = useSWR<any>(
     marketId ? `${JUP_API_BASE}/markets/${marketId}` : null,
-    fetcher,
+    async (url: string) => {
+      const res = await fetch(url)
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({ error: "Failed to fetch" }))
+        throw new Error(error.error || "Failed to fetch")
+      }
+      const data = await res.json()
+      console.log("[v0] Market data from Jupiter/Kalshi API:", data)
+      return data
+    },
     {
       refreshInterval: 5000, // Refresh every 5 seconds for live prices
       revalidateOnFocus: true,
