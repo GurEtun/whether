@@ -58,10 +58,15 @@ function generateEventMarkets(eventId: string, limit: number = 10) {
   }
 
   // Determine type from seed
-  const types = Object.keys(marketTemplatesByType)
+  const types = Object.keys(marketTemplatesByType) as Array<keyof typeof marketTemplatesByType>
   const typeIndex = seed % types.length
-  const type = types[typeIndex] as keyof typeof marketTemplatesByType
+  const type = types[typeIndex]
   const templates = marketTemplatesByType[type]
+
+  console.log("[v0] Generating markets for eventId:", eventId, "seed:", seed, "type:", type, "templates:", templates)
+
+  // Fallback to crypto templates if undefined
+  const safeTemplates = templates || marketTemplatesByType.crypto
 
   for (let i = 0; i < limit; i++) {
     const random = (offset: number) => {
@@ -74,7 +79,7 @@ function generateEventMarkets(eventId: string, limit: number = 10) {
     markets.push({
       id: `market-${eventId}-${i + 1}`,
       eventId,
-      title: templates[i % templates.length],
+      title: safeTemplates[i % safeTemplates.length],
       yesPrice: Math.round(yesPrice * 100) / 100,
       noPrice: Math.round((100 - yesPrice) * 100) / 100,
       volume: Math.round(random(1) * 100000 + 10000),
