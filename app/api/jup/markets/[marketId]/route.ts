@@ -11,7 +11,7 @@ export async function GET(
   try {
     const { marketId } = await params
     
-    const response = await upstreamFetch(`/api/v1/markets/${marketId}`, req)
+    const response = await upstreamFetch(`/prediction/v1/markets/${marketId}`)
     
     if (!response.ok) {
       const errorText = await response.text()

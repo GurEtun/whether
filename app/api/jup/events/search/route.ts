@@ -1,54 +1,31 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { getCorsHeaders, errorResponse, handleOptions } from "@/lib/jup-client"
+import { getCorsHeaders, errorResponse, handleOptions, upstreamFetch } from "@/lib/jup-client"
 
 export async function OPTIONS() {
   return handleOptions()
-}
-
-// Generate realistic events data
-function generateEvents(limit: number = 20) {
-  const eventCategories = ["Crypto", "Politics", "Sports", "Economics", "Science & Tech", "Entertainment"]
-  const events = []
-
-  for (let i = 0; i < limit; i++) {
-    const now = Date.now()
-    const category = eventCategories[i % eventCategories.length]
-    
-    events.push({
-      id: `event-${i + 1}`,
-      title: `${category} Event ${i + 1}`,
-      description: `Major ${category.toLowerCase()} event with multiple prediction markets`,
-      category,
-      status: i % 3 === 0 ? "closed" : i % 2 === 0 ? "active" : "pending",
-      startDate: now - i * 86400000,
-      endDate: now + (30 - i) * 86400000,
-      marketCount: Math.floor(Math.random() * 10) + 3,
-      volume: Math.round(Math.random() * 500000 + 50000),
-    })
-  }
-
-  return events
 }
 
 export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams
     const query = searchParams.get("query")
-    const limit = parseInt(searchParams.get("limit") || "20", 10)
     
     if (!query) {
       return errorResponse("Missing required query parameter: query", 400)
     }
 
-    let events = generateEvents(Math.min(limit, 100))
+    // Use Jupiter's search endpoint
+    const params = new URLSearchParams({ q: query, provider: "kalshi", includeMarkets: "true" })
+    const response = await upstreamFetch(`/prediction/v1/events/search?${params}`)
     
-    // Filter by search query
-    events = events.filter(e => 
-      e.title.toLowerCase().includes(query.toLowerCase()) ||
-      e.description.toLowerCase().includes(query.toLowerCase())
-    )
+    if (!response.ok) {
+      const errorText = await response.text()
+      return errorResponse("Search API error", response.status, { details: errorText })
+    }
+    
+    const data = await response.json()
 
-    return NextResponse.json({ events }, {
+    return NextResponse.json(data, {
       status: 200,
       headers: getCorsHeaders(),
     })

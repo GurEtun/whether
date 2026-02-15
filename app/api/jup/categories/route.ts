@@ -5,17 +5,16 @@ export async function OPTIONS() {
   return handleOptions()
 }
 
+// Categories from Jupiter Prediction API
 const MARKET_CATEGORIES = [
-  "Crypto",
-  "Politics",
-  "Sports",
-  "Economics",
-  "Science & Tech",
-  "Entertainment",
-  "Weather",
-  "Gaming",
-  "Social",
-  "Other",
+  "all",
+  "crypto",
+  "sports",
+  "politics",
+  "esports",
+  "culture",
+  "economics",
+  "tech",
 ]
 
 export async function GET(request: NextRequest) {

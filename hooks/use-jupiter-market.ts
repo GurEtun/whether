@@ -153,7 +153,7 @@ export function useJupiterMarketStats(marketId: string | null) {
 }
 
 /**
- * Fetch all events/markets
+ * Fetch all events/markets from Jupiter Kalshi endpoint
  */
 export function useJupiterEvents(category?: string) {
   const params = new URLSearchParams()
@@ -168,8 +168,10 @@ export function useJupiterEvents(category?: string) {
     }
   )
 
+  // Jupiter API returns { data: [...], pagination: {...} }
   return {
-    events: data?.events || [],
+    events: data?.data || [],
+    pagination: data?.pagination || null,
     isLoading,
     isError: error,
     refresh: mutate,

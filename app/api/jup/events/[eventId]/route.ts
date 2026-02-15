@@ -15,7 +15,7 @@ export async function GET(
   try {
     const { eventId } = await params
     
-    const response = await upstreamFetch(`/api/v1/events/${eventId}`, req)
+    const response = await upstreamFetch(`/prediction/v1/events/${eventId}?includeMarkets=true`)
     
     if (!response.ok) {
       const errorText = await response.text()

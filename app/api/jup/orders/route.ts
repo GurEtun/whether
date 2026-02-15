@@ -1,16 +1,37 @@
-import { type NextRequest } from "next/server"
-import { upstreamFetch, handleOptions } from "@/lib/jup-client"
+import { type NextRequest, NextResponse } from "next/server"
+import { upstreamFetch, handleOptions, getCorsHeaders, errorResponse } from "@/lib/jup-client"
 
 export async function GET(req: NextRequest) {
-  return upstreamFetch("/api/v1/orders", req)
+  try {
+    const response = await upstreamFetch("/prediction/v1/orders", req)
+    if (!response.ok) return errorResponse("Orders API error", response.status)
+    const data = await response.json()
+    return NextResponse.json(data, { headers: getCorsHeaders() })
+  } catch (e) {
+    return errorResponse("Failed to fetch orders", 500)
+  }
 }
 
 export async function POST(req: NextRequest) {
-  return upstreamFetch("/api/v1/orders", req, { method: "POST" })
+  try {
+    const response = await upstreamFetch("/prediction/v1/orders", req, { method: "POST" })
+    if (!response.ok) return errorResponse("Orders API error", response.status)
+    const data = await response.json()
+    return NextResponse.json(data, { headers: getCorsHeaders() })
+  } catch (e) {
+    return errorResponse("Failed to create order", 500)
+  }
 }
 
 export async function DELETE(req: NextRequest) {
-  return upstreamFetch("/api/v1/orders", req, { method: "DELETE" })
+  try {
+    const response = await upstreamFetch("/prediction/v1/orders", req, { method: "DELETE" })
+    if (!response.ok) return errorResponse("Orders API error", response.status)
+    const data = await response.json()
+    return NextResponse.json(data, { headers: getCorsHeaders() })
+  } catch (e) {
+    return errorResponse("Failed to delete orders", 500)
+  }
 }
 
 export async function OPTIONS() {

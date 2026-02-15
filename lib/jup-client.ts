@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 
 export const JUP_BASE_URL = "https://api.jup.ag"
-export const JUP_PREDICTION_URL = "https://prediction-market-api.jup.ag"
+export const JUP_PREDICTION_URL = "https://api.jup.ag"
 
 /**
  * Get Jupiter API key from environment
@@ -70,75 +70,49 @@ export function errorResponse(
 }
 
 /**
- * Fetch from upstream Jupiter API with proper error handling
+ * Fetch from upstream Jupiter Prediction API (raw Response for route handlers to process)
  */
 export async function upstreamFetch(
   path: string,
-  req: NextRequest,
+  req?: NextRequest,
   init?: RequestInit,
   baseUrl: string = JUP_PREDICTION_URL
-): Promise<NextResponse> {
-  const url = buildUrl(path, req, baseUrl)
-  const method = init?.method || req.method
+): Promise<Response> {
+  const url = req ? buildUrl(path, req, baseUrl) : new URL(path, baseUrl).toString()
+  const method = init?.method || req?.method || "GET"
   const apiKey = getApiKey()
 
-  try {
-    const headers: HeadersInit = {
-      "Content-Type": "application/json",
-      "Accept": "application/json",
-      "User-Agent": "Whether-Prediction-Market/1.0",
-      ...(apiKey && { "x-api-key": apiKey }),
-    }
-
-    const fetchInit: RequestInit = {
-      method,
-      headers,
-      ...init,
-    }
-
-    // For POST/DELETE, pass through the body
-    if ((method === "POST" || method === "DELETE") && !init?.body) {
-      try {
-        const body = await req.text()
-        if (body) {
-          fetchInit.body = body
-        }
-      } catch {
-        // No body or already consumed, continue without
-      }
-    }
-
-    const response = await fetch(url, fetchInit)
-
-    if (!response.ok) {
-      let errorDetails: unknown
-      try {
-        errorDetails = await response.json()
-      } catch {
-        errorDetails = await response.text()
-      }
-      
-      return errorResponse(
-        `Upstream API error: ${response.statusText}`,
-        response.status,
-        errorDetails
-      )
-    }
-
-    const data = await response.json()
-    
-    return NextResponse.json(data, {
-      status: 200,
-      headers: getCorsHeaders(),
-    })
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error"
-    return errorResponse("Failed to fetch from upstream API", 500, { message })
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "User-Agent": "Whether-Prediction-Market/1.0",
+    ...(apiKey && { "x-api-key": apiKey }),
   }
+
+  const fetchInit: RequestInit = {
+    method,
+    headers,
+    ...init,
+  }
+
+  // For POST/DELETE, pass through the body
+  if ((method === "POST" || method === "DELETE") && !init?.body && req) {
+    try {
+      const body = await req.text()
+      if (body) {
+        fetchInit.body = body
+      }
+    } catch {
+      // No body or already consumed, continue without
+    }
+  }
+
+  return fetch(url, fetchInit)
 }
 
 /**
- * Direct fetch from Jupiter API (for server-side use)
+ * Direct fetch from Jupiter Prediction API (for server-side use)
+ * Automatically prefixes paths with /prediction/v1
  */
 export async function jupiterFetch<T>(
   path: string,
@@ -150,7 +124,11 @@ export async function jupiterFetch<T>(
   }
 ): Promise<T> {
   const baseUrl = options?.baseUrl || JUP_PREDICTION_URL
-  const url = new URL(path, baseUrl)
+  // Ensure path uses the correct /prediction/v1 prefix
+  const normalizedPath = path.startsWith("/prediction/v1")
+    ? path
+    : path.replace(/^\/api\/v1/, "/prediction/v1")
+  const url = new URL(normalizedPath, baseUrl)
   const apiKey = getApiKey()
   
   if (options?.params) {
@@ -170,7 +148,8 @@ export async function jupiterFetch<T>(
   })
 
   if (!response.ok) {
-    throw new Error(`Jupiter API error: ${response.status} ${response.statusText}`)
+    const errorText = await response.text().catch(() => "")
+    throw new Error(`Jupiter API error: ${response.status} ${response.statusText} - ${errorText}`)
   }
 
   return response.json()

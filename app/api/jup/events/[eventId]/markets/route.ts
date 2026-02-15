@@ -23,9 +23,9 @@ export async function GET(
     })
 
     const queryString = queryParams.toString()
-    const endpoint = `/api/v1/events/${eventId}/markets${queryString ? `?${queryString}` : ""}`
+    const endpoint = `/prediction/v1/events/${eventId}/markets${queryString ? `?${queryString}` : ""}`
     
-    const response = await upstreamFetch(endpoint, req)
+    const response = await upstreamFetch(endpoint)
     
     if (!response.ok) {
       const errorText = await response.text()

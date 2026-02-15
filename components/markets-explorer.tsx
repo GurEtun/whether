@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -12,20 +12,91 @@ import Link from "next/link"
 import { type Market } from "@/lib/markets-data"
 import { useJupiterEvents } from "@/hooks/use-jupiter-market"
 
-const categories = ["All", "Crypto", "Politics", "Sports", "Economics", "Science & Tech", "Entertainment"]
-const statuses = ["All", "Active", "Closed", "Determined", "Finalized"]
+const categories = ["All", "Crypto", "Politics", "Sports", "Economics", "Tech", "Culture"]
+const statuses = ["All", "Open", "Closed"]
 
-interface EventWithMarkets {
-  id: string
+// Normalized event shape from Jupiter/Kalshi API
+interface NormalizedEvent {
+  eventId: string
   title: string
+  subtitle: string
   description: string
   category: string
-  status: string
-  startDate: number
-  endDate: number
-  marketCount: number
+  isActive: boolean
+  isLive: boolean
+  isTrending: boolean
+  volumeUsd: string
+  tvlDollars: string
+  imageUrl: string
+  beginAt: string | null
+  markets: NormalizedMarket[]
+}
+
+interface NormalizedMarket {
+  marketId: string
+  eventId: string
+  title: string
+  subtitle: string
+  description: string
+  status: "open" | "closed"
+  result: string | null
+  isTradable: boolean
+  openTime: number
+  closeTime: number
+  buyYesPriceUsd: number | null
+  buyNoPriceUsd: number | null
+  sellYesPriceUsd: number | null
+  sellNoPriceUsd: number | null
   volume: number
-  markets?: any[]
+  volume24h: number
+  openInterest: number
+  liquidityDollars: number
+  rulesPrimary: string
+  rulesSecondary: string
+}
+
+/** Normalize a raw Jupiter event into a flat, usable shape */
+function normalizeEvent(raw: any): NormalizedEvent {
+  return {
+    eventId: raw.eventId || raw.id || "",
+    title: raw.metadata?.title || raw.title || "",
+    subtitle: raw.metadata?.subtitle || "",
+    description: raw.metadata?.subtitle || raw.description || "",
+    category: raw.category || "all",
+    isActive: raw.isActive ?? true,
+    isLive: raw.isLive ?? false,
+    isTrending: raw.isTrending ?? false,
+    volumeUsd: raw.volumeUsd || "0",
+    tvlDollars: raw.tvlDollars || "0",
+    imageUrl: raw.metadata?.imageUrl || "",
+    beginAt: raw.beginAt || null,
+    markets: (raw.markets || []).map((m: any) => normalizeMarket(m, raw.eventId || raw.id)),
+  }
+}
+
+function normalizeMarket(raw: any, eventId: string): NormalizedMarket {
+  return {
+    marketId: raw.marketId || raw.id || "",
+    eventId: raw.event || eventId,
+    title: raw.metadata?.title || raw.title || "",
+    subtitle: raw.metadata?.subtitle || "",
+    description: raw.metadata?.description || raw.metadata?.subtitle || "",
+    status: raw.status === "open" ? "open" : "closed",
+    result: raw.result || null,
+    isTradable: raw.metadata?.isTradable ?? true,
+    openTime: raw.openTime || 0,
+    closeTime: raw.closeTime || raw.metadata?.closeTime || 0,
+    buyYesPriceUsd: raw.pricing?.buyYesPriceUsd ?? null,
+    buyNoPriceUsd: raw.pricing?.buyNoPriceUsd ?? null,
+    sellYesPriceUsd: raw.pricing?.sellYesPriceUsd ?? null,
+    sellNoPriceUsd: raw.pricing?.sellNoPriceUsd ?? null,
+    volume: raw.pricing?.volume ?? 0,
+    volume24h: raw.pricing?.volume24h ?? 0,
+    openInterest: raw.pricing?.openInterest ?? 0,
+    liquidityDollars: raw.pricing?.liquidityDollars ?? 0,
+    rulesPrimary: raw.metadata?.rulesPrimary || "",
+    rulesSecondary: raw.metadata?.rulesSecondary || "",
+  }
 }
 
 export function MarketsExplorer({ initialCategory }: { initialCategory?: string }) {
@@ -39,92 +110,60 @@ export function MarketsExplorer({ initialCategory }: { initialCategory?: string 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [displayMode, setDisplayMode] = useState<"markets" | "events">("markets")
   
-  // Fetch events from API
-  const { events, isLoading, isError } = useJupiterEvents(
+  // Fetch events from Jupiter/Kalshi API
+  const { events: rawEvents, isLoading, isError } = useJupiterEvents(
     selectedCategory !== "All" ? selectedCategory : undefined
   )
   
-  // Fetch markets for each event
-  const [eventsWithMarkets, setEventsWithMarkets] = useState<EventWithMarkets[]>([])
-  const [loadingMarkets, setLoadingMarkets] = useState(false)
+  // Normalize events from Jupiter API shape
+  const normalizedEvents: NormalizedEvent[] = (rawEvents || []).map(normalizeEvent)
   
-  useEffect(() => {
-    async function fetchMarketsForEvents() {
-      if (!events || events.length === 0) return
-      
-      setLoadingMarkets(true)
-      try {
-        const eventsData = await Promise.all(
-          events.map(async (event: any) => {
-            try {
-              const response = await fetch(`/api/jup/events/${event.id}/markets?limit=10`)
-              const data = await response.json()
-              return {
-                ...event,
-                markets: data.markets || []
-              }
-            } catch (error) {
-              console.log(`[v0] Failed to fetch markets for event ${event.id}:`, error)
-              return {
-                ...event,
-                markets: []
-              }
-            }
-          })
-        )
-        setEventsWithMarkets(eventsData)
-      } catch (error) {
-        console.log("[v0] Error fetching markets for events:", error)
-      } finally {
-        setLoadingMarkets(false)
-      }
-    }
-    
-    fetchMarketsForEvents()
-  }, [events])
+  console.log("[v0] Raw events from API:", rawEvents?.length, "first:", rawEvents?.[0] ? Object.keys(rawEvents[0]) : "none")
+  console.log("[v0] Normalized events:", normalizedEvents.length, "first title:", normalizedEvents[0]?.title, "markets:", normalizedEvents[0]?.markets?.length)
+  if (normalizedEvents[0]?.markets?.[0]) {
+    const m = normalizedEvents[0].markets[0]
+    console.log("[v0] First market:", m.title, "yes:", m.buyYesPriceUsd, "no:", m.buyNoPriceUsd, "vol:", m.volume)
+  }
   
-  // Convert events to market format for display compatibility
-  // Generate realistic fallback values when API returns null
-  const allMarkets: Market[] = eventsWithMarkets.flatMap((event) => 
-    (event.markets || []).map((market: any, index: number) => {
-      // Use market data if available, otherwise generate reasonable defaults
-      const seed = (event.id + market.id).split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
-      const random = (offset: number) => {
-        const x = Math.sin(seed + offset) * 10000
-        return x - Math.floor(x)
-      }
-      
-      const yesPrice = market.yesPrice ?? Math.round((30 + random(index) * 40) * 100) / 100
-      const noPrice = market.noPrice ?? Math.round((100 - yesPrice) * 100) / 100
-      const volume = market.volume ?? Math.round(random(index + 10) * 100000 + 10000)
-      const traders = market.traders ?? Math.floor(random(index + 20) * 1000 + 50)
+  // Convert to Market display format
+  const allMarkets: Market[] = normalizedEvents.flatMap((event) =>
+    event.markets.map((market) => {
+      // Convert cents price to percentage (Jupiter returns prices in USD cents 0-1)
+      const yesPrice = market.buyYesPriceUsd != null ? Math.round(market.buyYesPriceUsd * 100) : 50
+      const noPrice = market.buyNoPriceUsd != null ? Math.round(market.buyNoPriceUsd * 100) : 50
+      const vol = market.volume || 0
       
       return {
-        id: market.id,
-        title: market.title,
+        id: market.marketId,
+        title: market.title || "Untitled Market",
         category: event.category,
         series: event.title,
         eventName: event.title,
-        description: market.title,
+        description: market.description || market.subtitle || market.title,
         yesPrice,
         noPrice,
-        change: market.priceChange24h ?? Math.round((random(index + 30) - 0.5) * 20 * 100) / 100,
-        volume: `$${Math.round(volume / 1000)}K`,
-        totalVolume: `$${Math.round((volume * 5) / 1000)}K`,
-        traders,
-        endDate: market.endDate || new Date(event.endDate).toLocaleDateString(),
-        resolution: market.resolutionSource || "Official sources",
-        created: market.createdAt || new Date(event.startDate).toLocaleDateString(),
-        status: (market.status || event.status || "active") as Market['status'],
-        trending: market.trending || random(index + 40) > 0.8,
-      }
+        change: 0,
+        volume: vol > 0 ? `$${(vol / 1000).toFixed(0)}K` : "$0",
+        totalVolume: vol > 0 ? `$${(vol / 1000).toFixed(0)}K` : "$0",
+        traders: 0,
+        endDate: market.closeTime ? new Date(market.closeTime * 1000).toLocaleDateString() : "TBD",
+        resolution: market.rulesPrimary || "Official sources",
+        created: market.openTime ? new Date(market.openTime * 1000).toLocaleDateString() : "Recently",
+        status: market.status === "open" ? "active" : "closed",
+        trending: event.isTrending,
+      } as Market
     })
   )
   
   const filteredMarkets = allMarkets.filter((market) => {
-    const matchesSearch = market.title.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesCategory = selectedCategory === "All" || market.category === selectedCategory
-    const matchesStatus = selectedStatus === "All" || market.status === selectedStatus.toLowerCase()
+    const matchesSearch = searchQuery === "" || 
+      market.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      market.eventName?.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesCategory = selectedCategory === "All" || 
+      market.category?.toLowerCase() === selectedCategory.toLowerCase()
+    const matchesStatus = selectedStatus === "All" || 
+      (selectedStatus === "Open" && market.status === "active") ||
+      (selectedStatus === "Closed" && market.status === "closed")
     return matchesSearch && matchesCategory && matchesStatus
   })
 
@@ -246,10 +285,10 @@ export function MarketsExplorer({ initialCategory }: { initialCategory?: string 
       <div className="mb-3 sm:mb-4 flex items-center gap-2">
         <p className="text-xs sm:text-sm text-muted-foreground">
           {displayMode === "events" 
-            ? `Showing ${eventsWithMarkets.length} events` 
+            ? `Showing ${normalizedEvents.length} events` 
             : `Showing ${filteredMarkets.length} markets`}
         </p>
-        {(isLoading || loadingMarkets) && (
+        {isLoading && (
           <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
         )}
       </div>
@@ -268,14 +307,14 @@ export function MarketsExplorer({ initialCategory }: { initialCategory?: string 
       {!isLoading && displayMode === "events" ? (
         viewMode === "grid" ? (
           <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {eventsWithMarkets.map((event) => (
-              <EventCard key={event.id} event={event} />
+            {normalizedEvents.map((event) => (
+              <EventCard key={event.eventId} event={event} />
             ))}
           </div>
         ) : (
           <div className="space-y-2 sm:space-y-3">
-            {eventsWithMarkets.map((event) => (
-              <EventListItem key={event.id} event={event} />
+            {normalizedEvents.map((event) => (
+              <EventListItem key={event.eventId} event={event} />
             ))}
           </div>
         )
@@ -315,7 +354,7 @@ export function MarketsExplorer({ initialCategory }: { initialCategory?: string 
         </div>
       )}
       
-      {!isLoading && displayMode === "events" && eventsWithMarkets.length === 0 && (
+      {!isLoading && displayMode === "events" && normalizedEvents.length === 0 && (
         <div className="flex h-60 items-center justify-center rounded-lg border border-border bg-card">
           <div className="text-center">
             <Layers className="mx-auto h-12 w-12 text-muted-foreground opacity-50 mb-3" />
@@ -474,25 +513,30 @@ function MarketListItem({ market }: { market: Market }) {
   )
 }
 
-function EventCard({ event }: { event: EventWithMarkets }) {
+function EventCard({ event }: { event: NormalizedEvent }) {
+  const volumeNum = parseFloat(event.volumeUsd) || 0
+  const volumeDisplay = volumeNum > 1000 ? `$${(volumeNum / 1000).toFixed(0)}K` : `$${volumeNum.toFixed(0)}`
+  
   return (
     <Card
       className="group cursor-pointer border-border bg-card transition-all hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 h-full"
-      onClick={() => (window.location.href = `/events/${event.id}`)}
+      onClick={() => (window.location.href = `/events/${event.eventId}`)}
     >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="bg-secondary text-xs font-normal text-muted-foreground">
+              <Badge variant="secondary" className="bg-secondary text-xs font-normal text-muted-foreground capitalize">
                 {event.category}
               </Badge>
-              <Badge 
-                variant={event.status === "active" ? "default" : "secondary"}
-                className="text-xs capitalize"
-              >
-                {event.status}
-              </Badge>
+              {event.isLive && (
+                <Badge variant="default" className="text-xs">Live</Badge>
+              )}
+              {event.isTrending && (
+                <Badge variant="secondary" className="text-xs">
+                  <Flame className="h-3 w-3 mr-1" /> Trending
+                </Badge>
+              )}
             </div>
           </div>
         </div>
@@ -509,52 +553,60 @@ function EventCard({ event }: { event: EventWithMarkets }) {
           <div className="flex items-center gap-2">
             <Layers className="h-4 w-4 text-primary" />
             <div>
-              <p className="text-sm font-semibold text-foreground">{event.markets?.length || event.marketCount}</p>
+              <p className="text-sm font-semibold text-foreground">{event.markets.length}</p>
               <p className="text-xs text-muted-foreground">Markets</p>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-sm font-semibold text-foreground">${(event.volume / 1000).toFixed(0)}K</p>
+            <p className="text-sm font-semibold text-foreground">{volumeDisplay}</p>
             <p className="text-xs text-muted-foreground">Volume</p>
           </div>
         </div>
       </CardContent>
 
       <CardFooter className="flex items-center justify-between border-t border-border pt-3 text-xs text-muted-foreground">
-        <span className="flex items-center gap-1">
-          <Clock className="h-3 w-3" /> 
-          Ends {new Date(event.endDate).toLocaleDateString()}
-        </span>
-        <span className="text-primary font-medium">View Markets →</span>
+        {event.isActive ? (
+          <span className="flex items-center gap-1 text-green-500">
+            <span className="h-1.5 w-1.5 rounded-full bg-green-500" /> Active
+          </span>
+        ) : (
+          <span className="flex items-center gap-1">
+            <Clock className="h-3 w-3" /> Closed
+          </span>
+        )}
+        <span className="text-primary font-medium">View Markets &rarr;</span>
       </CardFooter>
     </Card>
   )
 }
 
-function EventListItem({ event }: { event: EventWithMarkets }) {
+function EventListItem({ event }: { event: NormalizedEvent }) {
+  const volumeNum = parseFloat(event.volumeUsd) || 0
+  const volumeDisplay = volumeNum > 1000 ? `$${(volumeNum / 1000).toFixed(0)}K` : `$${volumeNum.toFixed(0)}`
+  
   return (
     <Card
       className="group cursor-pointer border-border bg-card transition-all hover:border-primary/50"
-      onClick={() => (window.location.href = `/events/${event.id}`)}
+      onClick={() => (window.location.href = `/events/${event.eventId}`)}
     >
       <CardContent className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-4 gap-4">
         <div className="flex items-start gap-4 flex-1 w-full sm:w-auto">
           <div className="flex flex-col items-center justify-center px-3 py-2 rounded-lg bg-secondary/50 shrink-0">
             <Layers className="h-5 w-5 text-primary mb-1" />
-            <span className="text-lg font-bold text-foreground">{event.markets?.length || event.marketCount}</span>
+            <span className="text-lg font-bold text-foreground">{event.markets.length}</span>
             <span className="text-[10px] text-muted-foreground">Markets</span>
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="secondary" className="text-xs capitalize">
                 {event.category}
               </Badge>
-              <Badge 
-                variant={event.status === "active" ? "default" : "secondary"}
-                className="text-xs capitalize"
-              >
-                {event.status}
-              </Badge>
+              {event.isLive && (
+                <Badge variant="default" className="text-xs">Live</Badge>
+              )}
+              {event.isTrending && (
+                <Badge variant="secondary" className="text-xs">Trending</Badge>
+              )}
             </div>
             <h3 className="font-medium text-foreground group-hover:text-primary">{event.title}</h3>
             <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{event.description}</p>
@@ -563,15 +615,15 @@ function EventListItem({ event }: { event: EventWithMarkets }) {
 
         <div className="flex items-center gap-3 sm:gap-6 text-sm w-full sm:w-auto justify-between sm:justify-end">
           <div className="text-right">
-            <p className="font-medium text-foreground">${(event.volume / 1000).toFixed(0)}K</p>
+            <p className="font-medium text-foreground">{volumeDisplay}</p>
             <p className="text-xs text-muted-foreground">volume</p>
           </div>
           <div className="text-right hidden sm:block">
-            <p className="font-medium text-foreground">{new Date(event.endDate).toLocaleDateString()}</p>
-            <p className="text-xs text-muted-foreground">ends</p>
+            <p className="font-medium text-foreground">{event.isActive ? "Active" : "Closed"}</p>
+            <p className="text-xs text-muted-foreground">status</p>
           </div>
           <Button variant="ghost" size="sm" className="text-primary shrink-0">
-            View →
+            View &rarr;
           </Button>
         </div>
       </CardContent>
