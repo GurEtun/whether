@@ -11,23 +11,29 @@ export async function GET(
   try {
     const { marketId } = await params
     
-    console.log("[v0] Fetching market from Jupiter/Kalshi API:", marketId)
-    
-    // Fetch from Jupiter API
     const response = await upstreamFetch(`/api/v1/markets/${marketId}`, req)
+    
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error("Jupiter API error:", response.status, errorText)
+      return errorResponse(
+        `Jupiter API returned ${response.status}`,
+        response.status,
+        { details: errorText }
+      )
+    }
+    
     const data = await response.json()
     
-    console.log("[v0] Market data received from Jupiter/Kalshi:", JSON.stringify(data, null, 2))
-    
-    // Pass through ALL data fields from the API
     return NextResponse.json(data, {
       headers: getCorsHeaders(),
     })
   } catch (error) {
-    console.error("[v0] Error fetching market from Jupiter/Kalshi:", error)
+    console.error("Error fetching market from Jupiter/Kalshi API:", error)
     return errorResponse(
       error instanceof Error ? error.message : "Failed to fetch market",
-      500
+      500,
+      { details: error instanceof Error ? error.stack : undefined }
     )
   }
 }

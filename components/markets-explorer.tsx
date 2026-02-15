@@ -9,7 +9,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, TrendingUp, TrendingDown, Clock, Users, Flame, Grid3X3, List, Layers, Loader2 } from "lucide-react"
 import Link from "next/link"
-import { markets as allMarketsData, type Market } from "@/lib/markets-data"
+import { type Market } from "@/lib/markets-data"
 import { useJupiterEvents } from "@/hooks/use-jupiter-market"
 
 const categories = ["All", "Crypto", "Politics", "Sports", "Economics", "Science & Tech", "Entertainment"]
@@ -83,11 +83,8 @@ export function MarketsExplorer({ initialCategory }: { initialCategory?: string 
     fetchMarketsForEvents()
   }, [events])
   
-  console.log("[v0] Events from API:", events)
-  console.log("[v0] Events with markets:", eventsWithMarkets)
-  
   // Convert events to market format for display compatibility
-  const apiMarkets: Market[] = eventsWithMarkets.flatMap((event) => 
+  const allMarkets: Market[] = eventsWithMarkets.flatMap((event) => 
     (event.markets || []).map((market: any) => ({
       id: market.id,
       title: market.title,
@@ -95,22 +92,19 @@ export function MarketsExplorer({ initialCategory }: { initialCategory?: string 
       series: event.title,
       eventName: event.title,
       description: market.title,
-      yesPrice: market.yesPrice || 50,
-      noPrice: market.noPrice || 50,
-      change: Math.round((Math.random() - 0.5) * 20 * 100) / 100,
-      volume: `$${Math.round((market.volume || 10000) / 1000)}K`,
-      totalVolume: `$${Math.round((market.volume || 50000) / 1000)}K`,
-      traders: market.traders || 100,
+      yesPrice: market.yesPrice || 0,
+      noPrice: market.noPrice || 0,
+      change: market.priceChange24h || 0,
+      volume: market.volume ? `$${Math.round(market.volume / 1000)}K` : "$0",
+      totalVolume: market.totalVolume ? `$${Math.round(market.totalVolume / 1000)}K` : "$0",
+      traders: market.traders || 0,
       endDate: market.endDate || new Date(event.endDate).toLocaleDateString(),
-      resolution: "Official sources and verified data",
-      created: "Recently",
+      resolution: market.resolutionSource || "Official sources",
+      created: market.createdAt || new Date(event.startDate).toLocaleDateString(),
       status: (market.status || event.status || "active") as Market['status'],
-      trending: false,
+      trending: market.trending || false,
     }))
   )
-  
-  // Use API data if available, fallback to static data
-  const allMarkets = apiMarkets.length > 0 ? apiMarkets : allMarketsData
   
   const filteredMarkets = allMarkets.filter((market) => {
     const matchesSearch = market.title.toLowerCase().includes(searchQuery.toLowerCase())

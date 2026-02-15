@@ -66,9 +66,7 @@ export function useJupiterMarket(marketId: string | null) {
         const error = await res.json().catch(() => ({ error: "Failed to fetch" }))
         throw new Error(error.error || "Failed to fetch")
       }
-      const data = await res.json()
-      console.log("[v0] Market data from Jupiter/Kalshi API:", data)
-      return data
+      return await res.json()
     },
     {
       refreshInterval: 5000, // Refresh every 5 seconds for live prices
